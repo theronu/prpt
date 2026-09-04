@@ -39,11 +39,11 @@ since added or changed.
 2. Pick any nearby region, and choose **Start in production mode** (we'll set our own
    access rule in step 4).
 
-### 3. Turn on anonymous sign-in
+### 3. Turn on email/password sign-in
 
 1. In the left sidebar, under **Build**, click **Authentication** → **Get started**.
-2. On the **Sign-in method** tab, click **Anonymous**, toggle it **Enable**, and **Save**.
-   This lets the page connect automatically — nobody has to type a password.
+2. On the **Sign-in method** tab, click **Add new provider** → **Email/Password**, toggle it **Enable**, and **Save**. Leave "Email link (passwordless sign-in)" off.
+   3. Click the **Users** tab → **Add user**, and enter the email and password you want to sign in with. This is the login everyone opening the site will share — anyone without it can't get in.
 
 ### 4. Set the access rule
 
@@ -62,12 +62,7 @@ since added or changed.
    }
    ```
 
-   **What this does and doesn't do:** it blocks anyone who hasn't opened the page at all,
-   but anyone who *does* open your GitHub Pages link is signed in automatically and can
-   read and write everything — the same "anyone with the link" model as the original
-   Claude artifact. It is not a login screen and there's no per-person access control. If
-   you'd like real logins later (so only specific people can open it), that's a
-   straightforward follow-up — just ask.
+**What this does and doesn't do:** it blocks anyone who hasn't signed in with the email and password from step 3 — that's what makes this a password-protected site instead of "anyone with the link." Everyone who does sign in shares that one login and can read and write everything; there's no per-person access control. If you'd like separate logins per person later, that's a straightforward follow-up — just ask.
 
 ### 5. Get your config values
 
