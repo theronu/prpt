@@ -1615,7 +1615,7 @@
     return { init };
   })();
 
-  var appStarted=false; function bootAuthGate(){ if (!FIREBASE_CONFIGURED || typeof firebase==='undefined'){ renderSetupNotice(); return; } try{ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig); }catch(e){ renderSetupNotice(); return; } firebase.auth().onAuthStateChanged(function(user){ if (user){ if (!appStarted){ appStarted=true; App.init(); } } else { appStarted=false; renderLoginScreen(); } }); } bootAuthGate();
+  var appStarted=false; function bootAuthGate(){ if (!FIREBASE_CONFIGURED || typeof firebase==='undefined'){ renderSetupNotice(); return; } try{ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig); }catch(e){ renderSetupNotice(); return; } firebase.auth().onAuthStateChanged(function(user){ if (user && user.isAnonymous){ firebase.auth().signOut(); return; } if (user){ if (!appStarted){ appStarted=true; App.init(); } } else { appStarted=false; renderLoginScreen(); } }); } bootAuthGate();
 })();
 </script>
 </body></html>
