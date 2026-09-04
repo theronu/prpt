@@ -1,0 +1,1621 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><title>Site Sequence</title>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+<style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>Site Sequence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#F1EFE7; --surface:#FBFAF5; --surface-2:#EFEBDF;
+    --ink:#221F1A; --ink-dim:#655F52; --ink-faint:#8C8676;
+    --border:#DAD4C4; --border-strong:#C2BAA4;
+    --accent:#2B5D63; --accent-ink:#FFFFFF; --accent-soft:#DEEAEA; --accent-soft-ink:#1D4145;
+    --good:#3E7D4E; --good-soft:#E1EFE3;
+    --warning:#9A6B0C; --warning-soft:#F3E7CB;
+    --critical:#AE3B2E; --critical-soft:#F5E0DB;
+    --shadow: 0 1px 2px rgba(30,26,18,.06), 0 4px 14px rgba(30,26,18,.05);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#17191A; --surface:#1E2122; --surface-2:#26292A;
+      --ink:#ECE8DE; --ink-dim:#A79F8E; --ink-faint:#7C7568;
+      --border:#34383A; --border-strong:#454A4C;
+      --accent:#6FB9BE; --accent-ink:#0E2224; --accent-soft:#213638; --accent-soft-ink:#9FD8DC;
+      --good:#74C98A; --good-soft:#1B3324;
+      --warning:#E3B24A; --warning-soft:#3A2E12;
+      --critical:#E48577; --critical-soft:#3B211D;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#17191A; --surface:#1E2122; --surface-2:#26292A;
+    --ink:#ECE8DE; --ink-dim:#A79F8E; --ink-faint:#7C7568;
+    --border:#34383A; --border-strong:#454A4C;
+    --accent:#6FB9BE; --accent-ink:#0E2224; --accent-soft:#213638; --accent-soft-ink:#9FD8DC;
+    --good:#74C98A; --good-soft:#1B3324;
+    --warning:#E3B24A; --warning-soft:#3A2E12;
+    --critical:#E48577; --critical-soft:#3B211D;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Work Sans',system-ui,sans-serif;font-size:14.5px;line-height:1.5;}
+  h1,h2,h3{font-family:'Archivo',system-ui,sans-serif;text-wrap:balance;margin:0;}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+  a{color:var(--accent);}
+  button, select, input, textarea{font:inherit;color:inherit;}
+  button{cursor:pointer;}
+
+  #shell{display:flex;min-height:100vh;}
+  #rail{width:200px;flex:none;background:var(--surface);border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;gap:22px;}
+  #rail .brand{display:flex;align-items:baseline;gap:8px;padding:0 4px;}
+  #rail .brand .mark{font-family:'Archivo';font-weight:900;font-size:20px;letter-spacing:-.02em;}
+  #rail .brand .tag{font-family:'IBM Plex Mono';font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em;}
+  #rail nav{display:flex;flex-direction:column;gap:2px;}
+  #rail nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--ink-dim);text-decoration:none;font-weight:600;font-size:13.5px;}
+  #rail nav a.active{background:var(--accent-soft);color:var(--accent-soft-ink);}
+  #rail nav a:hover:not(.active){background:var(--surface-2);}
+  #rail .foot{margin-top:auto;font-size:11px;color:var(--ink-faint);padding:0 4px;}
+
+  #main{flex:1;min-width:0;padding:28px 34px 60px;}
+  .pagehead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+  .pagehead h1{font-size:26px;font-weight:900;}
+  .pagehead p{margin:4px 0 0;color:var(--ink-dim);max-width:52ch;}
+  .btn{background:var(--accent);color:var(--accent-ink);border:none;padding:9px 15px;border-radius:8px;font-weight:600;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;}
+  .btn:hover{filter:brightness(1.06);}
+  .btn.secondary{background:var(--surface-2);color:var(--ink);border:1px solid var(--border);}
+  .btn.ghost{background:transparent;color:var(--accent);padding:9px 4px;}
+  .btn.small{padding:5px 10px;font-size:12px;border-radius:6px;}
+  .btn.danger{background:var(--critical-soft);color:var(--critical);}
+
+  .banner{display:flex;gap:10px;align-items:flex-start;background:var(--warning-soft);color:var(--warning);border:1px solid color-mix(in srgb, var(--warning) 35%, transparent);border-radius:var(--radius);padding:11px 14px;margin-bottom:18px;font-size:13px;}
+  .banner strong{color:inherit;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+  .grid-jobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;}
+  .jobcard{padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:transform .08s ease;}
+  .jobcard:hover{border-color:var(--border-strong);}
+  .jobcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .jobcode{font-family:'Archivo';font-weight:900;font-size:19px;letter-spacing:-0.01em;}
+  .jobdesc{color:var(--ink-dim);font-size:12.5px;margin-top:1px;}
+  .jobclient{color:var(--ink-faint);font-size:11.5px;margin-top:3px;font-style:italic;}
+  .jobclientline{color:var(--ink-faint);font-size:12px;margin:-6px 0 14px;font-style:italic;}
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap;}
+  .pill.good{background:var(--good-soft);color:var(--good);}
+  .pill.warn{background:var(--warning-soft);color:var(--warning);}
+  .pill.crit{background:var(--critical-soft);color:var(--critical);}
+  .pill.neutral{background:var(--surface-2);color:var(--ink-dim);}
+  .jobstats{display:flex;gap:16px;border-top:1px solid var(--border);padding-top:10px;}
+  .jobstats .stat b{display:block;font-family:'IBM Plex Mono';font-size:15px;font-variant-numeric:tabular-nums;}
+  .jobstats .stat span{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.05em;}
+
+  .backlink{display:inline-flex;align-items:center;gap:6px;color:var(--ink-dim);text-decoration:none;font-size:12.5px;font-weight:600;margin-bottom:14px;}
+  .jobheader{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:18px;}
+  .jobheader .idbox{display:flex;align-items:baseline;gap:12px;}
+  .summarybar{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+  .summarybar .cell{flex:1;padding:12px 16px;border-right:1px solid var(--border);background:var(--surface);}
+  .summarybar .cell:last-child{border-right:none;}
+  .summarybar .cell span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);margin-bottom:3px;}
+  .summarybar .cell b{font-family:'IBM Plex Mono';font-size:17px;}
+
+  table.tasks{width:100%;border-collapse:collapse;font-size:13px;}
+  table.tasks th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);padding:8px 10px;border-bottom:1px solid var(--border-strong);}
+  table.tasks td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.tasks tr.critical td{background:color-mix(in srgb, var(--critical-soft) 55%, transparent);}
+  .taskname{font-weight:600;}
+  .tasknote{color:var(--ink-faint);font-size:11.5px;margin-top:2px;}
+  .badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+  .badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.03em;}
+  .badge.crit{background:var(--critical);color:#fff;}
+  .badge.near{background:var(--warning-soft);color:var(--warning);}
+  .badge.sub{background:var(--surface-2);color:var(--ink-dim);border:1px solid var(--border-strong);}
+  .badge.spec{background:var(--accent-soft);color:var(--accent-soft-ink);}
+  .badge.gen{background:var(--warning-soft);color:var(--warning);}
+
+  .timebox{margin-top:26px;}
+  .timebox h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:10px;}
+  .time-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .time-summary .chip{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;min-width:84px;}
+  .time-summary .chip span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:2px;}
+  .time-summary .chip b{font-family:'IBM Plex Mono';font-size:15px;font-variant-numeric:tabular-nums;}
+  form.timeform{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px;}
+  form.timeform .timeform-top{display:flex;align-items:flex-end;gap:8px;margin-bottom:10px;}
+  form.timeform .timeform-top label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--ink-dim);font-weight:600;}
+  form.timeform .timeform-top input{background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;padding:7px 9px;font-size:13px;}
+  .timepick{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+  .timepick-row{display:flex;align-items:center;gap:10px;}
+  .timepick-row label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;flex:1;}
+  .timepick-row input[type=number]{width:64px;background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;padding:5px 7px;font-size:13px;}
+  .timepick-row.disabled label{color:var(--ink-faint);font-weight:500;}
+  table.timelist{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;}
+  table.timelist th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);padding:6px 8px;border-bottom:1px solid var(--border-strong);}
+  table.timelist th.num, table.timelist td.num{text-align:right;}
+  table.timelist td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.timelist td.timedate{color:var(--ink-faint);white-space:nowrap;}
+  .spendbox{margin-top:26px;}
+  .spendbox h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:10px;}
+  .spend-budgetbar{display:flex;gap:0;border:1px solid var(--border-strong);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+  .spend-budgetbar .cell{flex:1;padding:10px 14px;border-right:1px solid var(--border);background:var(--surface);}
+  .spend-budgetbar .cell:last-child{border-right:none;}
+  .spend-budgetbar .cell span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);margin-bottom:3px;}
+  .spend-budgetbar .cell b{font-family:'IBM Plex Mono';font-size:16px;font-variant-numeric:tabular-nums;}
+  .spend-budgetbar .cell.over b{color:var(--critical);}
+  .spend-budgetbar .cell.under b{color:var(--ok, #2a9d5c);}
+  form.spendform{display:grid;grid-template-columns:1fr 130px 150px auto;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px;align-items:end;}
+  form.spendform label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--ink-dim);font-weight:600;}
+  form.spendform input{background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;padding:7px 9px;font-size:13px;}
+  table.spendlist{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;}
+  table.spendlist th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);padding:6px 8px;border-bottom:1px solid var(--border-strong);}
+  table.spendlist th.num, table.spendlist td.num{text-align:right;}
+  table.spendlist td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top;}
+  table.spendlist td.spenddate{color:var(--ink-faint);white-space:nowrap;}
+
+  .quotebox{margin-top:26px;}
+  .quotebox h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+  .quotebox h3 .quotemeta{text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink-dim);font-size:12px;}
+  table.quoteitems{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;}
+  table.quoteitems th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);padding:7px 8px;border-bottom:1px solid var(--border-strong);}
+  table.quoteitems th.num, table.quoteitems td.num{text-align:right;}
+  table.quoteitems td{padding:6px 8px;border-bottom:1px solid var(--border);}
+  table.quoteitems tr.sectionrow td{padding-top:14px;padding-bottom:4px;border-bottom:none;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);}
+  table.quoteitems tr.sectionrow:first-child td{padding-top:6px;}
+  table.quoteitems tr.totalrow td{border-bottom:none;border-top:2px solid var(--border-strong);font-weight:700;padding-top:9px;}
+  .quotenote{color:var(--ink-faint);font-style:italic;font-size:11px;}
+
+  .timeline{margin-top:22px;}
+  .tl-row{display:grid;grid-template-columns:180px 1fr;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);}
+  .tl-row .lbl{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .tl-track{position:relative;height:16px;background:var(--surface-2);border-radius:5px;}
+  .tl-bar{position:absolute;top:0;bottom:0;border-radius:5px;background:var(--accent);}
+  .tl-bar.critical{background:var(--critical);}
+  .tl-grid{position:relative;height:14px;margin:2px 0 8px 190px;border-bottom:1px dashed var(--border-strong);}
+
+  form.taskform{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:18px;}
+  form.taskform .full{grid-column:1/-1;}
+  form.taskform label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--ink-dim);font-weight:600;}
+  form.taskform input, form.taskform select, form.taskform textarea{background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;padding:7px 9px;font-size:13px;}
+  form.taskform .actions{grid-column:1/-1;display:flex;gap:8px;margin-top:4px;}
+  .crewpick{display:flex;flex-wrap:wrap;gap:6px;}
+  .crewpick label{flex-direction:row;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border-strong);padding:5px 9px;border-radius:99px;font-weight:500;}
+
+  .settings-section{margin-bottom:26px;}
+  .settings-section h2{font-size:16px;margin-bottom:10px;}
+  .rate-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:6px;}
+  .rate-table th{text-align:left;font-size:10px;text-transform:uppercase;color:var(--ink-faint);padding:6px 8px;border-bottom:1px solid var(--border-strong);}
+  .rate-table td{padding:5px 8px;border-bottom:1px solid var(--border);}
+  .rate-table input{width:100%;background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;padding:4px 6px;font-size:12.5px;}
+  .crewlist{display:flex;flex-direction:column;gap:10px;}
+  .crewblock{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
+  .crewrow{display:flex;gap:10px;align-items:center;}
+  .crewrow input[type=text]{background:transparent;border:none;border-bottom:1px solid var(--border-strong);padding:2px 2px;font-weight:600;}
+  .crewnotes{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+  .crewnote-chip{font-size:11px;background:var(--surface-2);border-radius:6px;padding:3px 8px;color:var(--ink-dim);}
+  .crewnote-chip .x{cursor:pointer;color:var(--ink-faint);margin-left:5px;font-weight:700;}
+  form.crewnoteform{display:flex;align-items:center;gap:6px;margin-left:auto;}
+  form.crewnoteform input[type=date]{font-size:11px;padding:3px 6px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface-2);}
+  form.crewnoteform input[type=text]{font-size:11px;padding:3px 6px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface-2);width:150px;}
+  form.crewnoteform button{font-size:11px;padding:3px 8px;}
+  .tagcloud{display:flex;gap:4px;flex-wrap:wrap;flex:1;}
+  .tagchip{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--border-strong);background:var(--surface-2);cursor:pointer;}
+  .tagchip.on{background:var(--accent-soft);color:var(--accent-soft-ink);border-color:transparent;}
+
+  .empty{padding:40px 20px;text-align:center;color:var(--ink-faint);}
+  .demo-banner{background:var(--accent-soft);color:var(--accent-soft-ink);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:12.5px;}
+
+  .riskblock{padding:14px 16px;margin-top:20px;border-color:var(--critical);}
+  .riskhead{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--critical);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+  .riskgroups{display:flex;flex-direction:column;gap:10px;}
+  .riskgroup{display:flex;gap:12px;}
+  .riskgroup-code{flex:0 0 auto;min-width:76px;font-weight:700;font-size:12.5px;padding-top:1px;}
+  .riskgroup-lines{display:flex;flex-direction:column;gap:4px;flex:1;}
+  .riskrow{display:flex;align-items:baseline;gap:8px;font-size:13px;}
+  .riskdot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;transform:translateY(-1px);}
+  .dot-critical{background:var(--critical);}
+  .dot-warn{background:var(--warning);}
+  .risktext{color:var(--ink-dim);}
+  .risktoggle{background:none;border:none;color:var(--ink-dim);font-size:11.5px;font-weight:600;cursor:pointer;text-decoration:underline;padding:0;}
+
+  .ganttcard{margin-bottom:20px;padding:16px 18px;}
+  .ganttcard h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:2px;}
+  .gantt-scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-faint);margin:2px 0 8px 130px;}
+  .gantt-rows{display:flex;flex-direction:column;gap:5px;}
+  .gantt-row{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;cursor:pointer;}
+  .gantt-row .lbl{font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .gantt-row .lbl small{display:block;font-weight:500;color:var(--ink-faint);font-size:10.5px;}
+  .gantt-track{position:relative;height:18px;background:var(--surface-2);border-radius:5px;}
+  .gantt-bar{position:absolute;top:0;bottom:0;border-radius:5px;min-width:6px;display:flex;align-items:center;justify-content:center;overflow:visible;}
+  .gantt-bar-label{font-size:9.5px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none;}
+  .gantt-bar-label.in{color:#fff;mix-blend-mode:normal;}
+  .gantt-bar-label.out{position:absolute;top:50%;transform:translateY(-50%);margin-left:5px;color:var(--ink-faint);}
+  .gantt-bar.bar-crit{background:var(--critical);}
+  .gantt-bar.bar-warn{background:var(--warning);}
+  .gantt-bar.bar-good{background:var(--accent);}
+  .gantt-bar.bar-neutral{background:var(--ink-faint);}
+  .gantt-today{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.55;}
+  .gantt-unscheduled{margin-top:8px;font-size:11.5px;color:var(--ink-faint);}
+
+  ::selection{background:var(--accent-soft);}
+  @media (max-width: 760px){
+    #shell{flex-direction:column;}
+    #rail{width:100%;flex-direction:row;align-items:center;padding:12px 16px;}
+    #rail nav{flex-direction:row;}
+    #rail .foot{display:none;}
+    #main{padding:18px 16px 40px;}
+    form.taskform{grid-template-columns:1fr 1fr;}
+  }
+</style>
+
+<div id="shell">
+  <aside id="rail">
+    <div class="brand"><span class="mark">Site Sequence</span></div>
+    <nav id="nav">
+      <a href="#/jobs" data-route="jobs">Jobs</a>
+      <a href="#/settings" data-route="settings">Settings</a>
+    </nav>
+    <div class="foot">Working day 08:30–16:00<br>7 productive hrs · Mon–Fri</div>
+  </aside>
+  <main id="main"><div class="empty">Loading…</div></main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================
+     SECTION: Firebase config — standalone GitHub Pages build
+     ========================================================= */
+  const firebaseConfig = {
+    apiKey: "PASTE_YOUR_API_KEY_HERE",
+    authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "PASTE_YOUR_PROJECT_ID",
+    storageBucket: "PASTE_YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
+  };
+  const FIREBASE_CONFIGURED = !!(firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf('PASTE_') !== 0);
+
+  // Theron's real jobs/crew/settings data, captured from the original Claude artifact.
+  // Written into Firestore automatically, once, the first time this page connects to an
+  // empty database — so the standalone version opens with real data instead of blank.
+  const SEED_DATA = {"settings": {"calendar": {"dayEnd": "16:00", "dayStart": "08:30", "holidays": ["2026-12-25", "2026-12-26", "2027-01-01"], "lunchMinutes": 30, "productiveHoursPerDay": 7, "updatedAt": "2026-09-03T00:00:00.000Z", "workingDays": [1, 2, 3, 4, 5]}, "rates": {"blockSizeTierThresholds": {"mediumMaxDays": 15, "smallMaxDays": 5}, "categories": {"building": {"baseRatePerDay": 8, "defaultCalcType": "area", "groupForEfficiency": "open", "label": "Building work", "subTypes": {"standard": {"label": "Standard", "multiplier": 1}}, "unit": "m²"}, "cabinetry": {"defaultCalcType": "unit", "groupForEfficiency": "confined", "label": "Cabinetry", "subTypes": {"standard": {"label": "Built-in, build + install", "multiplier": 1}}, "timePerUnitDays": 1, "unit": "linear m"}, "carpentry": {"blockDaysByTier": {"large": 5, "medium": 2.5, "small": 1}, "defaultCalcType": "block", "groupForEfficiency": "open", "label": "Carpentry", "subTypes": {"standard": {"label": "General joinery", "multiplier": 1}}}, "ceilings": {"baseRatePerDay": 15, "defaultCalcType": "area", "groupForEfficiency": "open", "label": "Ceilings", "subTypes": {"standard": {"label": "Suspended/drywall", "multiplier": 1}}, "unit": "m²"}, "cleaning": {"blockDaysByTier": {"large": 2, "medium": 1, "small": 1}, "defaultCalcType": "block", "groupForEfficiency": "open", "label": "Cleaning", "subTypes": {"standard": {"label": "Standard", "multiplier": 1}}}, "demolition": {"baseRatePerDay": 25, "defaultCalcType": "area", "groupForEfficiency": "open", "label": "Demolition/strip-out", "subTypes": {"standard": {"label": "Standard", "multiplier": 1}}, "unit": "m²"}, "doors": {"defaultCalcType": "unit", "groupForEfficiency": "open", "label": "Doors", "subTypes": {"standard": {"label": "Hang + hardware", "multiplier": 1}}, "timePerUnitDays": 0.5, "unit": "door"}, "electrical": {"defaultCalcType": "unit", "groupForEfficiency": "specialist", "label": "Electrical", "subTypes": {"standard": {"label": "Rough-in / fit-off", "multiplier": 1}}, "timePerUnitDays": 0.4, "unit": "point"}, "fixtures": {"defaultCalcType": "unit", "groupForEfficiency": "open", "label": "Fixtures & Fittings", "subTypes": {"standard": {"label": "Taps, mirrors, light fittings", "multiplier": 1}}, "timePerUnitDays": 0.15, "unit": "item"}, "flooring": {"baseRatePerDay": 25, "defaultCalcType": "area", "groupForEfficiency": "confined", "label": "Flooring", "subTypes": {"engineered_timber": {"label": "Engineered timber", "multiplier": 1.2}, "herringbone_chevron": {"label": "Herringbone/chevron", "multiplier": 2}, "solid_timber": {"label": "Solid timber", "multiplier": 1.35}, "standard": {"label": "Standard/laminate/vinyl", "multiplier": 1}}, "unit": "m²"}, "painting": {"baseRatePerDay": 70, "defaultCalcType": "area", "groupForEfficiency": "open", "label": "Painting", "subTypes": {"standard": {"label": "Standard 2-coat", "multiplier": 1}}, "unit": "m²"}, "plumbing": {"defaultCalcType": "unit", "groupForEfficiency": "specialist", "label": "Plumbing", "subTypes": {"standard": {"label": "Rough-in / fit-off", "multiplier": 1}}, "timePerUnitDays": 0.5, "unit": "point"}, "snagging": {"blockDaysByTier": {"large": 2, "medium": 1, "small": 1}, "defaultCalcType": "block", "groupForEfficiency": "open", "label": "Final snagging", "subTypes": {"standard": {"label": "Standard", "multiplier": 1}}}, "tiling": {"baseRatePerDay": 12.5, "defaultCalcType": "area", "groupForEfficiency": "confined", "label": "Tiling", "subTypes": {"herringbone": {"label": "Herringbone/patterned/complex", "multiplier": 2.75}, "large_format": {"label": "Large-format", "multiplier": 0.85}, "mosaic": {"label": "Mosaic", "multiplier": 2}, "standard": {"label": "Standard ceramic/porcelain", "multiplier": 1}, "subway": {"label": "Subway/brick", "multiplier": 1.3}}, "unit": "m²"}, "waterproofing": {"baseRatePerDay": 25, "defaultCalcType": "area", "groupForEfficiency": "confined", "label": "Waterproofing", "subTypes": {"standard": {"label": "Membrane application", "multiplier": 1}}, "unit": "m²"}, "windows": {"defaultCalcType": "unit", "groupForEfficiency": "open", "label": "Windows", "subTypes": {"standard": {"label": "Install", "multiplier": 1}}, "timePerUnitDays": 0.5, "unit": "window"}}, "updatedAt": "2026-09-03T00:00:00.000Z"}, "crewRules": {"bottleneckSlackThresholdDays": 1, "efficiencyCurves": {"confined": {"1": 1, "2": 1.65, "3": 1.65}, "open": {"1": 1, "2": 1.9, "3": 2.7}, "specialist": {"1": 1, "2": 1, "3": 1}}, "generalistPenalty": 0.8, "updatedAt": "2026-09-03T00:00:00.000Z"}}, "crew": {"blessing": {"active": true, "createdAt": "2026-09-03T00:00:00.000Z", "name": "Blessing", "role": "subcontractor", "tradeTags": ["electrical"]}, "bourne": {"active": true, "attendanceNotes": [{"addedAt": "2026-09-04T00:00:00.000Z", "date": "2026-08-31", "id": "cn_seed1", "note": "Absent"}], "createdAt": "2026-09-03T00:00:00.000Z", "logsTime": true, "name": "Bourne", "role": "labourer", "tradeTags": ["building", "cleaning"]}, "clover": {"active": true, "createdAt": "2026-09-03T00:00:00.000Z", "logsTime": true, "name": "Clover", "role": "labourer", "tradeTags": ["general"]}, "elton": {"active": true, "createdAt": "2026-09-03T00:00:00.000Z", "logsTime": true, "name": "Elton", "role": "labourer", "tradeTags": ["general"]}, "joseph": {"active": true, "createdAt": "2026-09-03T00:00:00.000Z", "logsTime": true, "name": "Joseph", "role": "labourer", "tradeTags": ["building", "cleaning"]}, "lallie": {"active": true, "createdAt": "2026-09-03T00:00:00.000Z", "name": "Lallie", "role": "subcontractor", "tradeTags": ["tiling", "flooring"]}, "robin": {"active": true, "attendanceNotes": [{"addedAt": "2026-09-04T00:00:00.000Z", "date": "2026-09-03", "id": "cn_seed2", "note": "Worked to 12:00 (half day)"}, {"addedAt": "2026-09-04T00:00:00.000Z", "date": "2026-09-05", "id": "cn_seed3", "note": "Weekend off (5-6 Sep)"}], "createdAt": "2026-09-03T00:00:00.000Z", "logsTime": true, "name": "Robin", "role": "foreman", "tradeTags": ["cabinetry", "doors", "windows", "carpentry", "building"]}, "schoolboy": {"active": true, "createdAt": "2026-09-03T00:00:00.000Z", "name": "Schoolboy", "role": "subcontractor", "tradeTags": ["tiling", "flooring"]}, "sergio": {"active": true, "createdAt": "2026-09-03T00:00:00.000Z", "name": "Sergio", "role": "subcontractor", "tradeTags": ["cabinetry", "carpentry"]}, "theron": {"active": true, "createdAt": "2026-09-03T00:00:00.000Z", "name": "Theron", "role": "foreman", "tradeTags": ["cabinetry", "carpentry", "building", "general"]}}, "jobs": {"job-21b": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 1, "estimatedCompletionDate": "2026-09-23", "totalWorkingDays": 1}, "clientName": "Elsabe Schoeman", "code": "21B", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Ceiling & paint, window cills & skirting — complete except gas cabinet & door", "isEstateJob": true, "order": 1, "quoteDate": null, "quoteLineItems": [{"description": "Kitchen Countertop Replacement: EeziQuartz Macadamia", "note": null, "qty": 1, "quoteNumber": "QU00209", "section": "General Renovations", "total": 23967, "unitPrice": 23967}, {"description": "Remove & Dispose Old Countertop", "note": null, "qty": 1, "quoteNumber": "QU00209", "section": "General Renovations", "total": 1500, "unitPrice": 1500}, {"description": "Replace Kitchen Sink", "note": null, "qty": 1, "quoteNumber": "QU00209", "section": "General Renovations", "total": 2559, "unitPrice": 2559}, {"description": "Courier Fee", "note": null, "qty": 1, "quoteNumber": "QU00209", "section": "General Renovations", "total": 150, "unitPrice": 150}, {"description": "Install Kitchen Sink", "note": null, "qty": 1, "quoteNumber": "QU00209", "section": "General Renovations", "total": 750, "unitPrice": 750}, {"description": "Electrical: Install 10 x Downlights + Switches", "note": null, "qty": 1, "quoteNumber": "QU00209", "section": "General Renovations", "total": 6215, "unitPrice": 6215}, {"description": "Repair Ceiling Holes & Repaint", "note": null, "qty": 1, "quoteNumber": "QU00209", "section": "General Renovations", "total": 500, "unitPrice": 500}], "quoteNumber": null, "quotes": [{"date": "2026-07-02", "number": "QU00209"}], "saturdayCatchUp": false, "startDate": "2026-09-23", "status": "🟢 On track", "updatedAt": "2026-09-03T00:00:00.000Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": [], "durationOverrideDays": 1, "name": "Patio cupboard — gas cabinet & door", "notes": "Only item left on this job — rest confirmed complete by Theron (3 Sep). Delayed to 23 Sep to clear Robin double-bookings with higher-priority jobs (33C/61D/99A/54A/7 Entaa). Still needs Robin + 1 more crew member named — assign in app. Duration is an estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-29a": {"cachedSummary": {"bottleneckCount": 2, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 4, "estimatedCompletionDate": "2026-09-22", "totalWorkingDays": 13.3}, "clientName": "Klarissa Engelbrecht/Viola Jung, Remax Plett", "code": "29A", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Vinyl flooring (in progress) → tile patios → paint 3 bed/3 bath/stairwell/kitchen (160m² unit) → replace window (8 cills)", "isEstateJob": true, "order": -1, "quoteDate": null, "quoteLineItems": [{"description": "Remove & Replace Cornices", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Top Floor", "total": 3850, "unitPrice": 3850}, {"description": "Paint: Ceiling & Walls", "note": null, "qty": 115, "quoteNumber": "QU00218", "section": "Top Floor", "total": 14375, "unitPrice": 125}, {"description": "Remove & Replace Skirting", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Top Floor", "total": 4880, "unitPrice": 4880}, {"description": "Remove & Dispose Carpet", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Top Floor", "total": 1500, "unitPrice": 1500}, {"description": "Remove & Replace Bathroom Vanity", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Top Floor", "total": 5500, "unitPrice": 5500}, {"description": "Replace Carpets", "note": null, "qty": 25, "quoteNumber": "QU00218", "section": "Top Floor", "total": 12000, "unitPrice": 480}, {"description": "Remove & Replace Built in Cupboards", "note": null, "qty": 2, "quoteNumber": "QU00218", "section": "Top Floor", "total": 19100, "unitPrice": 9550}, {"description": "Remove & Dispose Carpet", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Stairs", "total": 2500, "unitPrice": 2500}, {"description": "Replace Carpets", "note": null, "qty": 25, "quoteNumber": "QU00218", "section": "Stairs", "total": 12000, "unitPrice": 480}, {"description": "Carpet Labour: Stairs", "note": null, "qty": 25, "quoteNumber": "QU00218", "section": "Stairs", "total": 3125, "unitPrice": 125}, {"description": "Remove & Replace Cornice", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Middle Floor", "total": 7700, "unitPrice": 7700}, {"description": "Paint: Ceiling & Walls", "note": null, "qty": 230, "quoteNumber": "QU00218", "section": "Middle Floor", "total": 28750, "unitPrice": 125}, {"description": "Remove & Replace Skirting", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Middle Floor", "total": 9760, "unitPrice": 9760}, {"description": "Remove & Dispose Carpet", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Middle Floor", "total": 2500, "unitPrice": 2500}, {"description": "Remove & Replace Bathroom Vanity", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Middle Floor", "total": 9500, "unitPrice": 9500}, {"description": "Replace Carpets", "note": null, "qty": 50, "quoteNumber": "QU00218", "section": "Middle Floor", "total": 24000, "unitPrice": 480}, {"description": "Remove & Replace Built in Cupboards", "note": null, "qty": 2, "quoteNumber": "QU00218", "section": "Middle Floor Continued", "total": 7700, "unitPrice": 3850}, {"description": "Remove & Replace Cornice", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Ground Floor", "total": 7700, "unitPrice": 7700}, {"description": "Paint: Ceiling & Walls", "note": null, "qty": 185, "quoteNumber": "QU00218", "section": "Ground Floor", "total": 23125, "unitPrice": 125}, {"description": "Remove & Replace Skirting", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Ground Floor", "total": 9760, "unitPrice": 9760}, {"description": "Remove & Dispose Carpet", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Ground Floor", "total": 2500, "unitPrice": 2500}, {"description": "Replace Carpet", "note": null, "qty": 25, "quoteNumber": "QU00218", "section": "Ground Floor", "total": 12000, "unitPrice": 480}, {"description": "Remove & Replace all damaged windowills", "note": null, "qty": 12, "quoteNumber": "QU00218", "section": "Additional", "total": 9000, "unitPrice": 750}, {"description": "Sundries & Consumables", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Additional", "total": 13800, "unitPrice": 13800}, {"description": "Materials Shipping Costs", "note": null, "qty": 1, "quoteNumber": "QU00218", "section": "Additional", "total": 1500, "unitPrice": 1500}, {"description": "Remove All Patio Tiles & Dispose", "note": null, "qty": 1, "quoteNumber": "QU00219-1", "section": "Top Floor", "total": 2650, "unitPrice": 2650}, {"description": "Level & Waterproof Patio", "note": null, "qty": 20, "quoteNumber": "QU00219-1", "section": "Top Floor", "total": 3900, "unitPrice": 195}, {"description": "Patio Tiles (PQ)", "note": null, "qty": 20, "quoteNumber": "QU00219-1", "section": "Top Floor", "total": 5000, "unitPrice": 250}, {"description": "Labour: Patio Tiling", "note": null, "qty": 20, "quoteNumber": "QU00219-1", "section": "Top Floor", "total": 4100, "unitPrice": 205}, {"description": "Remove All Patio Tiles & Dispose", "note": null, "qty": 1, "quoteNumber": "QU00219-1", "section": "Middle Floor", "total": 1350, "unitPrice": 1350}, {"description": "Level & Waterproof Patio", "note": null, "qty": 7.5, "quoteNumber": "QU00219-1", "section": "Middle Floor", "total": 1462.5, "unitPrice": 195}, {"description": "Patio Tiles (PQ)", "note": null, "qty": 7.5, "quoteNumber": "QU00219-1", "section": "Middle Floor", "total": 1875, "unitPrice": 250}, {"description": "Labour: Patio Tiling", "note": null, "qty": 7.5, "quoteNumber": "QU00219-1", "section": "Middle Floor", "total": 1537.5, "unitPrice": 205}], "quoteNumber": null, "quotes": [{"date": "2026-07-17", "number": "QU00218"}, {"date": "2026-08-13", "number": "QU00219-1"}], "saturdayCatchUp": false, "startDate": "2026-09-03", "status": "🟢 On track — currently busy", "updatedAt": "2026-09-03T15:38:12.958Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "area", "category": "flooring", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["lallie", "schoolboy"], "dependsOn": [], "durationOverrideDays": 4, "name": "Vinyl flooring (in progress)", "notes": "4 working days remaining per Theron (3 Sep) — confirmed remaining duration, not a fresh estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "area", "category": "tiling", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["lallie", "schoolboy"], "dependsOn": ["t1"], "durationOverrideDays": 3, "name": "Tile patios", "notes": "3 working days per Theron (3 Sep) — confirmed duration, not an estimate.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "large", "calcType": "area", "category": "painting", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": [], "dependsOn": ["t2"], "durationOverrideDays": null, "name": "Paint — 3 bed, 3 bath, stairwell & kitchen (160m² unit)", "notes": "Real area given by Theron (160m² unit) — duration calculated from the painting rate in Settings. Staff not yet assigned, assign in app.", "order": 3, "quantity": 160, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t4": {"blockSizeTier": "small", "calcType": "unit", "category": "windows", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": [], "dependsOn": ["t3"], "durationOverrideDays": null, "name": "Replace window (8 cills)", "notes": "8 window cills, per Theron. Duration calculated from the windows per-unit rate (approximation — that rate is per window, not per cill). Staff not yet assigned, assign in app.", "order": 4, "quantity": 8, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-33c": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 5, "estimatedCompletionDate": "2026-09-10", "totalWorkingDays": 3.5}, "clientName": "Stephen & Debbie Kenney", "code": "33C", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Windows, doors & skirtings — scaffold, rip out & install new windows, plaster, prime & paint reveals", "isEstateJob": true, "order": 0, "quoteDate": null, "quoteLineItems": [{"description": "Replace Damaged Nutec Ceiling Board", "note": null, "qty": 1, "quoteNumber": "QU00222", "section": null, "total": 780, "unitPrice": 780}, {"description": "Labour: Install, Skim & Sand", "note": null, "qty": 1, "quoteNumber": "QU00222", "section": null, "total": 1450, "unitPrice": 1450}, {"description": "Paint: Entire Ceiling, Water Based Non Drip Enamel", "note": null, "qty": 20, "quoteNumber": "QU00222", "section": null, "total": 2100, "unitPrice": 105}, {"description": "Remove Damaged Corrugated Iron Sheets & Dispose", "note": null, "qty": 1, "quoteNumber": "QU00222", "section": null, "total": 750, "unitPrice": 750}, {"description": "Replace Corrugated Iron Roof Sheets 6.6m", "note": null, "qty": 5, "quoteNumber": "QU00222", "section": null, "total": 5288.75, "unitPrice": 1057.75}, {"description": "Labour: Install Roof Sheets", "note": null, "qty": 1, "quoteNumber": "QU00222", "section": null, "total": 1450, "unitPrice": 1450}, {"description": "Waterproof: Flash Harry Fiber Flex, 3 Coats incl. Labour", "note": null, "qty": 1, "quoteNumber": "QU00222", "section": null, "total": 1280, "unitPrice": 1280}], "quoteNumber": null, "quotes": [{"date": "2026-07-30", "number": "QU00222"}], "saturdayCatchUp": false, "startDate": "2026-09-07", "status": "🔥 Top priority", "updatedAt": "2026-09-04T00:00:00.000Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "block", "category": "building", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": [], "durationOverrideDays": 0.5, "name": "Build scaffolding", "notes": "Delayed to Monday 7 Sep due to adverse weather (originally planned 4 Sep). Whole team on this job. Duration is an estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "block", "category": "demolition", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": ["t1"], "durationOverrideDays": 0.5, "name": "Rip out existing windows", "notes": "Per Theron, 3 Sep. Whole team on this job. Duration is an estimate.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "small", "calcType": "unit", "category": "windows", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": ["t2"], "durationOverrideDays": 1, "name": "Install new windows", "notes": "Awaiting window delivery, previously expected 08/09 — may push this start. Whole team on this job. Duration is an estimate.", "order": 3, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t4": {"blockSizeTier": "small", "calcType": "block", "category": "building", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": ["t3"], "durationOverrideDays": 0.5, "name": "Plaster reveals", "notes": "Per Theron, 3 Sep. Whole team on this job. Duration is an estimate.", "order": 4, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t5": {"blockSizeTier": "small", "calcType": "area", "category": "painting", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": ["t4"], "durationOverrideDays": 1, "name": "Prime & paint reveals", "notes": "Per Theron, 3 Sep. Whole team on this job. Duration is an estimate — confirm real m² with Theron.", "order": 5, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-3b": {"cachedSummary": {"bottleneckCount": 2, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 1, "estimatedCompletionDate": "2026-09-17", "totalWorkingDays": 3}, "clientName": "Robert & Warin Nezar", "code": "3B", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Patio roof, tiling & bathrooms — awaiting approval and deposit", "isEstateJob": true, "order": 17.5, "quoteDate": null, "quoteLineItems": [{"description": "Draft Drawings, Municipal & BC Submission", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Design, Submission, Approval", "total": 6500, "unitPrice": 6500}, {"description": "Construct Patio Roof: 3 x 9m", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Roof", "total": 82500, "unitPrice": 82500}, {"description": "Install seamless aluminium gutter", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Closed eaves & facias, Braai flue cutout, waterproofing", "total": 4780, "unitPrice": 4780}, {"description": "30mm IsoBoard", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Ceiling", "total": 7298.6, "unitPrice": 7298.6}, {"description": "Structure", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Ceiling", "total": 5307.25, "unitPrice": 5307.25}, {"description": "Labour", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Ceiling", "total": 6802.25, "unitPrice": 6802.25}, {"description": "Cornice", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Ceiling", "total": 3289, "unitPrice": 3289}, {"description": "Cornice Labour", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Ceiling", "total": 900, "unitPrice": 900}, {"description": "Sundries", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Ceiling", "total": 1868.75, "unitPrice": 1868.75}, {"description": "Break out existing tiles & carpets, dispose", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Tiling", "total": 4650, "unitPrice": 4650}, {"description": "Labour: Tiling", "note": null, "qty": 131, "quoteNumber": "QU00228", "section": "Tiling", "total": 25545, "unitPrice": 195}, {"description": "Sundries & Consumables", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Tiling", "total": 2900, "unitPrice": 2900}, {"description": "Skirting: PVC 70mm", "note": null, "qty": 100, "quoteNumber": "QU00228", "section": "Skirting", "total": 8500, "unitPrice": 85}, {"description": "Skirting: Labour", "note": null, "qty": 100, "quoteNumber": "QU00228", "section": "Skirting", "total": 6500, "unitPrice": 65}, {"description": "Stacking Windows: 6 Panel Centre Opening 3000mm x 1200mm", "note": null, "qty": 2, "quoteNumber": "QU00228", "section": "Windows & Aluminium: Stacking Windows", "total": 64898, "unitPrice": 32449}, {"description": "Stacking Windows: 3 Panel Left to Right 2500mm x 1200mm", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Windows & Aluminium: Stacking Windows", "total": 21229, "unitPrice": 21229}, {"description": "Stacking Windows: 3 Panel Right to Left 2500mm x 1200mm", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Windows & Aluminium: Stacking Windows", "total": 21229, "unitPrice": 21229}, {"description": "Aluminium Shopfront Frame: 3000mm x 800mm", "note": null, "qty": 2, "quoteNumber": "QU00228", "section": "Windows & Aluminium: Stacking Windows", "total": 14622.4, "unitPrice": 7311.2}, {"description": "Aluminium Shopfront Frame: 2500mm x 800mm", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Windows & Aluminium: Stacking Windows", "total": 6247.8, "unitPrice": 6247.8}, {"description": "Remove & Replace Toilets incl. labour", "note": null, "qty": 2, "quoteNumber": "QU00228", "section": "Additional", "total": 11000, "unitPrice": 5500}, {"description": "Bathroom Vanity: Floating 600mm x 500mm Incl. Drop In Basin", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Additional", "total": 8213.4, "unitPrice": 8213.4}, {"description": "Bathroom Mixer", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Additional", "total": 1200, "unitPrice": 1200}, {"description": "Sundries", "note": null, "qty": 1, "quoteNumber": "QU00228", "section": "Additional", "total": 1890, "unitPrice": 1890}], "quoteNumber": null, "quotes": [{"date": "2026-08-19", "number": "QU00228"}], "saturdayCatchUp": false, "startDate": "2026-09-15", "status": "🟡 Waiting on Client", "updatedAt": "2026-09-03T16:05:14.796Z", "tasks": {"t1": {"blockSizeTier": "medium", "calcType": "block", "category": "building", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": [], "dependsOn": [], "durationOverrideDays": 2, "name": "Patio roof", "notes": "External roofer (Sass) per spreadsheet — not on internal crew roster. Duration is an estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "area", "category": "tiling", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["lallie"], "dependsOn": [], "durationOverrideDays": 2, "name": "Tiling", "notes": "Duration is an estimate — confirm real m² with Theron.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "medium", "calcType": "block", "category": "building", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": [], "durationOverrideDays": 3, "name": "Bathrooms", "notes": "Duration is an estimate — confirm scope with Theron.", "order": 3, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-49a": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 3, "estimatedCompletionDate": "2026-10-07", "totalWorkingDays": 1.7}, "clientName": "Marianna & Johan Van Der Riet", "code": "49A", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Bathroom — build a vanity and install bathroom fittings", "isEstateJob": true, "order": 17.2, "quoteDate": null, "quoteLineItems": [{"description": "Manufacture & Install Bathroom Vanity", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 4500, "unitPrice": 4500}, {"description": "Install Countertop", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 2300, "unitPrice": 2300}, {"description": "Install Countertop Basin: White", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 1995, "unitPrice": 1995}, {"description": "Install Countertop Mixer", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 1850, "unitPrice": 1850}, {"description": "Remove & Replace Shower Mixer: Black", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 1350, "unitPrice": 1350}, {"description": "Remove & Replace Shower Neck & Rose: Black", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 650, "unitPrice": 650}, {"description": "Install Towel Rail & Ring; Black", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 1250, "unitPrice": 1250}, {"description": "Manufacture & Install Towel Rack above Toilet", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 3500, "unitPrice": 3500}, {"description": "Solid Black Mirror Round 700mm", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 2079, "unitPrice": 2079}, {"description": "Break out existing basin & rubble removal", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 1500, "unitPrice": 1500}, {"description": "Plumbing & Installation", "note": null, "qty": 1, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 950, "unitPrice": 950}, {"description": "Paint Exposed Walls & Ceiling (Anti Fungal Drip Free Enamel)", "note": null, "qty": 23, "quoteNumber": "QU00204", "section": "Bathroom Renovation: Middle Floor", "total": 2415, "unitPrice": 105}], "quoteNumber": null, "quotes": [{"date": "2026-06-15", "number": "QU00204"}], "saturdayCatchUp": false, "startDate": "2026-10-06", "status": "🟢 On track", "updatedAt": "2026-09-03T00:00:00.000Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "block", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": [], "durationOverrideDays": 1, "name": "Build vanity", "notes": "Per Theron (3 Sep). Duration is an estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "unit", "category": "fixtures", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": ["t1"], "durationOverrideDays": 0.5, "name": "Install bathroom fittings", "notes": "Per Theron (3 Sep). Duration is an estimate.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "small", "calcType": "unit", "category": "fixtures", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": ["t2"], "durationOverrideDays": 0.15, "name": "Install towel rail", "notes": "Per Theron (3 Sep). Duration is an estimate.", "order": 3, "quantity": 1, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-54a": {"cachedSummary": {"bottleneckCount": 3, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 2, "estimatedCompletionDate": "2026-09-21", "totalWorkingDays": 2.5}, "clientName": "Tarik El Mohamadi", "code": "54A", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Break out & waterproof & tile patio (6m²), remove damaged cupboards, install 2 large wardrobes (wood already delivered)", "isEstateJob": true, "order": 15, "quoteDate": null, "quoteLineItems": [{"description": "Replace Damaged Ceiling: Top Floor 30mm IsoBoard", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Top Floor Bedroom", "total": 14525, "unitPrice": 14525}, {"description": "Ceiling Labour", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Top Floor Bedroom", "total": 9296, "unitPrice": 9296}, {"description": "Replace Damaged Cornice: Top Floor", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Top Floor Bedroom", "total": 4357.5, "unitPrice": 4357.5}, {"description": "Cornice Labour", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Top Floor Bedroom", "total": 1307.25, "unitPrice": 1307.25}, {"description": "Sundries & Consumables", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Top Floor Bedroom", "total": 4154.15, "unitPrice": 4154.15}, {"description": "Paint: Ceiling & Wall Corner to Corner", "note": null, "qty": 60, "quoteNumber": "QU00199", "section": "Top Floor Bedroom", "total": 6300, "unitPrice": 105}, {"description": "Replace Damaged Skirting", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Top Floor Bedroom", "total": 4210, "unitPrice": 4210}, {"description": "Skirting Labour", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Top Floor Bedroom", "total": 1280, "unitPrice": 1280}, {"description": "Repair Damaged Wall: Lounge/Diningroom", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Bottom Floor Wall", "total": 1250, "unitPrice": 1250}, {"description": "Paint: Ceiling & Wall Corner to Corner", "note": null, "qty": 110, "quoteNumber": "QU00199", "section": "Bottom Floor Wall", "total": 11550, "unitPrice": 105}, {"description": "Demolition & Rubble Removal", "note": null, "qty": 1, "quoteNumber": "QU00199", "section": "Bottom Floor Wall", "total": 2850, "unitPrice": 2850}, {"description": "Remove & Replace Bedroom Cupboards: Swollen", "note": null, "qty": 2, "quoteNumber": "QU00199", "section": "Cupboards", "total": 16300, "unitPrice": 8150}], "quoteNumber": null, "quotes": [{"date": "2026-06-04", "number": "QU00199"}], "saturdayCatchUp": false, "startDate": "2026-09-17", "status": "🟢 On track", "updatedAt": "2026-09-03T00:00:00.000Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "area", "category": "demolition", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["elton"], "dependsOn": [], "durationOverrideDays": null, "name": "Break out patio", "notes": "6m², per Theron (3 Sep) — duration calculated from the demolition rate in Settings.", "order": 1, "quantity": 6, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "area", "category": "waterproofing", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["elton"], "dependsOn": ["t1"], "durationOverrideDays": null, "name": "Waterproof patio", "notes": "6m², per Theron (3 Sep) — duration calculated from the waterproofing rate in Settings.", "order": 2, "quantity": 6, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "small", "calcType": "area", "category": "tiling", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["lallie"], "dependsOn": ["t2"], "durationOverrideDays": null, "name": "Tile patio", "notes": "6m², per Theron (3 Sep) — duration calculated from the tiling rate in Settings.", "order": 3, "quantity": 6, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t4": {"blockSizeTier": "small", "calcType": "block", "category": "demolition", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["elton"], "dependsOn": [], "durationOverrideDays": 0.5, "name": "Remove damaged cupboards", "notes": "Per Theron (3 Sep). Duration is an estimate — no count given.", "order": 4, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t5": {"blockSizeTier": "medium", "calcType": "unit", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": ["t4"], "durationOverrideDays": 2, "name": "Install 2 large wardrobes", "notes": "Wood already delivered — no material delay risk on this one. Duration is an estimate — the cabinetry rate is per linear m, not per wardrobe, so this is a flagged guess.", "order": 5, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-61d": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 1, "estimatedCompletionDate": "2026-09-07", "totalWorkingDays": 2.7}, "clientName": "Heidi Walther", "code": "61D", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Patio enclosure — 60% complete; cupboard install & curtain rails outstanding, plus new 3.8m bedroom wardrobes", "isEstateJob": true, "order": 0.75, "quoteDate": null, "quoteLineItems": [{"description": "Drawings, Municipal & Body Corporate Submissions for approval", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Design, Submission, Approval", "total": 5000, "unitPrice": 5000}, {"description": "Roof Sheeting, Flashes & Barges", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Enclose Patio Roof", "total": 7860, "unitPrice": 7860}, {"description": "Structure & Facias", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Enclose Patio Roof", "total": 4970, "unitPrice": 4970}, {"description": "Labour", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Enclose Patio Roof", "total": 6150, "unitPrice": 6150}, {"description": "Sundries & Consumables", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Enclose Patio Roof", "total": 2450, "unitPrice": 2450}, {"description": "Gutter & Downpipe", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Enclose Patio Roof", "total": 2890, "unitPrice": 2890}, {"description": "30mm ISO-Board", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Ceiling", "total": 2410, "unitPrice": 2410}, {"description": "Structure", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Ceiling", "total": 1755, "unitPrice": 1755}, {"description": "Labour", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Ceiling", "total": 2245, "unitPrice": 2245}, {"description": "Cornice", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Ceiling", "total": 1295, "unitPrice": 1295}, {"description": "Cornice Labour", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Ceiling", "total": 865, "unitPrice": 865}, {"description": "Sundries & Consumables", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Ceiling", "total": 1230, "unitPrice": 1230}, {"description": "Construct Braai Enclosure & Roof Frame", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Building & Wet Work", "total": 6260, "unitPrice": 6260}, {"description": "Labour", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Building & Wet Work", "total": 5900, "unitPrice": 5900}, {"description": "Sundries & Consumables", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Building & Wet Work", "total": 2780, "unitPrice": 2780}, {"description": "Manufacture & Install Under Counter Cabinets, Broom Cupboard", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Cabinetry", "total": 7584, "unitPrice": 7584}, {"description": "Countertop: Granite or EeziQuartz + Floating Shelf", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Cabinetry", "total": 9800, "unitPrice": 9800}, {"description": "Electrical: 2 Outlets, Braai Light, Down Lights, Strip Light", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Cabinetry", "total": 6450, "unitPrice": 6450}, {"description": "Jetmaster Entertainer Deluxe 1000", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Braai", "total": 18999, "unitPrice": 18999}, {"description": "Storm Cowl Stainless", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Braai", "total": 3500, "unitPrice": 3500}, {"description": "Stainless Steel Flue 300mm Diameter, 1.2m", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Braai", "total": 3899, "unitPrice": 3899}, {"description": "Installation: Incl. Fire Blanket", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Braai", "total": 2900, "unitPrice": 2900}, {"description": "Break out and Dispose existing tiles", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Patio Flooring", "total": 1500, "unitPrice": 1500}, {"description": "Level floor to match inside", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Patio Flooring", "total": 2800, "unitPrice": 2800}, {"description": "Patio Tiles to match inside floor (PQ)", "note": null, "qty": 12, "quoteNumber": "QU00220", "section": "Patio Flooring", "total": 3000, "unitPrice": 250}, {"description": "Tiling Labour", "note": null, "qty": 12, "quoteNumber": "QU00220", "section": "Patio Flooring", "total": 2340, "unitPrice": 195}, {"description": "Aluminium Balustrade, Safety Glass 4500 x 1000mm", "note": null, "qty": 2, "quoteNumber": "QU00220", "section": "Aluminium Windows", "total": 8000, "unitPrice": 4000}, {"description": "Aluminium Stacking Windows 1750 x 1100, 2750 x 1100mm", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Aluminium Windows", "total": 15660, "unitPrice": 15660}, {"description": "Installation, Plaster Reveal, Paint Touch Up", "note": null, "qty": 2, "quoteNumber": "QU00220", "section": "Aluminium Windows", "total": 2000, "unitPrice": 1000}, {"description": "Core Drill 300mm Flue Hole", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Inside Fireplace", "total": 3500, "unitPrice": 3500}, {"description": "Shipping", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Inside Fireplace", "total": 250, "unitPrice": 250}, {"description": "Supply: 600mm Closed Combustion Fireplace (PQ)", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Inside Fireplace", "total": 15000, "unitPrice": 15000}, {"description": "Construct Fireplace Structure, Wood Storage, polished concrete", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Inside Fireplace", "total": 3730, "unitPrice": 3730}, {"description": "Installation: Incl Fire Bricks, Cowl & Flue, Waterproofing", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Inside Fireplace", "total": 8649, "unitPrice": 8649}, {"description": "Supply & Install Cladding: Eva-Last Revive 2400 x 600mm Panels", "note": null, "qty": 14, "quoteNumber": "QU00220", "section": "Cladding", "total": 16730, "unitPrice": 1195}, {"description": "Labour", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Cladding", "total": 2500, "unitPrice": 2500}, {"description": "Manufacture & Install Bedroom Cupboards as per rendering", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Bedroom Cupboard", "total": 39275, "unitPrice": 39275}, {"description": "Electrical: Bedside Lights, LED Strip Light, Backlit Mirror", "note": null, "qty": 1, "quoteNumber": "QU00220", "section": "Bedroom Cupboard", "total": 4399, "unitPrice": 4399}], "quoteNumber": null, "quotes": [{"date": "2026-07-19", "number": "QU00220"}], "saturdayCatchUp": false, "startDate": "2026-09-03", "status": "🟢 On track", "timeOnSite": [{"addedAt": "2026-09-04T08:01:48.331Z", "crewId": "bourne", "date": "2026-09-04", "days": 1, "id": "to_mtmo0xt7op31f_bourne"}, {"addedAt": "2026-09-04T08:01:48.331Z", "crewId": "clover", "date": "2026-09-04", "days": 1, "id": "to_mtmo0xt7esc5x_clover"}, {"addedAt": "2026-09-04T08:01:48.331Z", "crewId": "elton", "date": "2026-09-04", "days": 1, "id": "to_mtmo0xt70liqs_elton"}, {"addedAt": "2026-09-04T08:01:48.331Z", "crewId": "joseph", "date": "2026-09-04", "days": 1, "id": "to_mtmo0xt7kmfw9_joseph"}], "updatedAt": "2026-09-04T08:01:48.331Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "unit", "category": "fixtures", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": [], "durationOverrideDays": 0.3, "name": "Curtain rails — install", "notes": "From To-Do sheet (due 8 Sep) — duration is an estimate. Cupboard install & curtain amendments already marked done in spreadsheet.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "unit", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": [], "durationOverrideDays": 1, "name": "Complete cupboard install", "notes": "From whiteboard (3 Sep) — awaiting material, expected 10/09. Duration is an estimate.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "small", "calcType": "unit", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "elton", "joseph"], "dependsOn": [], "durationOverrideDays": null, "name": "Install wardrobes (bedroom)", "notes": "3.8m wide series of wardrobes, bedroom. Starts tomorrow afternoon (4 Sep) per Theron — the app schedules by full working day, so treat the computed start date as day-level, not afternoon-precise.", "order": 3, "quantity": 3.8, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-6a": {"cachedSummary": {"bottleneckCount": 2, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 1, "estimatedCompletionDate": "2026-09-07", "totalWorkingDays": 0.5}, "clientName": "Carol Pillay", "code": "6A", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Install blind & fix shower floor (rework)", "isEstateJob": true, "order": 6, "quoteDate": null, "quoteLineItems": [{"description": "Manufacture & Install Over Sink Cabinet", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Manufacture & Install Under Island Drawers & Cupboards", "total": 17843.8, "unitPrice": 17843.8}, {"description": "Install Gas Hob: Bosch Glass Automatic Hob", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Manufacture & Install Under Island Drawers & Cupboards", "total": 5850, "unitPrice": 5850}, {"description": "Gas Installation: Incl. 9kg Gas Bottle", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Manufacture & Install Under Island Drawers & Cupboards", "total": 3750, "unitPrice": 3750}, {"description": "Remove & Dispose Bath", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Bathroom", "total": 1750, "unitPrice": 1750}, {"description": "Plumbing: Reposition Drain & Trap Waste", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Bathroom", "total": 1380, "unitPrice": 1380}, {"description": "Retile Shower: ~ 13 sqm", "note": null, "qty": 13, "quoteNumber": "QU00216", "section": "Bathroom", "total": 3250, "unitPrice": 250}, {"description": "Supply Tiles: ~ 13 sqm (PQ)", "note": null, "qty": 13, "quoteNumber": "QU00216", "section": "Bathroom", "total": 3835, "unitPrice": 295}, {"description": "Supply & Install Walk In Shower Screen (PQ)", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Bathroom", "total": 5000, "unitPrice": 5000}, {"description": "Eva-Last Infinity Decking, Fascia Boards, Clips & Screws", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Outside Composite Deck", "total": 28850, "unitPrice": 28850}, {"description": "Structure: Joists, Posts, Truss Hangers", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Outside Composite Deck", "total": 9990, "unitPrice": 9990}, {"description": "Labour", "note": null, "qty": 1, "quoteNumber": "QU00216", "section": "Outside Composite Deck", "total": 5500, "unitPrice": 5500}], "quoteNumber": null, "quotes": [{"date": "2026-07-16", "number": "QU00216"}], "saturdayCatchUp": false, "startDate": "2026-09-07", "status": "🟢 On track", "updatedAt": "2026-09-03T16:04:56.866Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "unit", "category": "fixtures", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": [], "durationOverrideDays": 0.3, "name": "Install blind", "notes": "Just 1 blind to put up, per Theron (3 Sep). Duration is an estimate.", "order": 1, "quantity": 1, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "unit", "category": "plumbing", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["lallie"], "dependsOn": [], "durationOverrideDays": 0.5, "name": "Fix shower floor (rework)", "notes": "Lallie (subcontractor) messed this up the first time — needs to fix it, per Theron (3 Sep). Duration is an estimate.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-70a": {"cachedSummary": {"bottleneckCount": 1, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 1, "estimatedCompletionDate": "2026-09-03", "totalWorkingDays": 0.3}, "clientName": "Yolandi Schoeman", "code": "70A", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Light fitting", "isEstateJob": true, "order": 17, "quoteDate": null, "quoteLineItems": [{"description": "Remove & Replace Bulkhead", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "Main Bedroom", "total": 2760, "unitPrice": 2760}, {"description": "Remove & Replace Damaged Cupboard", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "Main Bedroom", "total": 5760, "unitPrice": 5760}, {"description": "Replace Damaged Cornice", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "Main Bedroom", "total": 600, "unitPrice": 600}, {"description": "Repair Water Damaged Wall & Waterproof", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "Main Bedroom", "total": 500, "unitPrice": 500}, {"description": "Repair Water Damaged Plaster around Window", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "2nd Bedroom", "total": 2190, "unitPrice": 2190}, {"description": "Repair Damaged Air Vent Cover", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "2nd Bedroom", "total": 350, "unitPrice": 350}, {"description": "Electrical: Re-fit Bulkhead Downlights", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "General", "total": 1500, "unitPrice": 1500}, {"description": "Paint: Affected Ceilings & Walls", "note": null, "qty": 75, "quoteNumber": "QU00192", "section": "General", "total": 7875, "unitPrice": 105}, {"description": "Labour", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "General", "total": 3250, "unitPrice": 3250}, {"description": "Repair Damaged Patio Roof: Plaster Delaminating, water ingress", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "70A Castleton", "total": 950, "unitPrice": 950}, {"description": "Waterproof affected area", "note": null, "qty": 1, "quoteNumber": "QU00192", "section": "70A Castleton", "total": 598, "unitPrice": 598}, {"description": "Repaint", "note": null, "qty": 12, "quoteNumber": "QU00192", "section": "70A Castleton", "total": 1260, "unitPrice": 105}], "quoteNumber": null, "quotes": [{"date": "2026-05-21", "number": "QU00192"}], "saturdayCatchUp": false, "startDate": "2026-09-03", "status": "🟢 On track", "updatedAt": "2026-09-03T16:05:32.356Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "unit", "category": "electrical", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["blessing"], "dependsOn": [], "durationOverrideDays": 0.3, "name": "Install light fitting", "notes": "From whiteboard. Duration is an estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-72d": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 3, "estimatedCompletionDate": "2026-09-29", "totalWorkingDays": 4}, "clientName": "Sharel Uys", "code": "72D", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Ceiling & paint, balustrade + window breakout — balustrade ordered", "isEstateJob": true, "order": 13, "quoteDate": null, "quoteLineItems": [{"description": "Middle Patio - Left: 2270 x 925mm", "note": null, "qty": 1, "quoteNumber": "QU00223", "section": null, "total": 8115.36, "unitPrice": 8115.36}, {"description": "MiddlePatio - Front: 3000 x 925mm", "note": null, "qty": 1, "quoteNumber": "QU00223", "section": null, "total": 10199.6, "unitPrice": 10199.6}, {"description": "Middle Patio - Right: 270 x 925mm", "note": null, "qty": 1, "quoteNumber": "QU00223", "section": null, "total": 2135.6, "unitPrice": 2135.6}, {"description": "Top Patio - Left: 1720 x 925mm", "note": null, "qty": 1, "quoteNumber": "QU00223", "section": null, "total": 6798.4, "unitPrice": 6798.4}, {"description": "Top Patio - Front: 2295 x 925mm", "note": null, "qty": 1, "quoteNumber": "QU00223", "section": null, "total": 8280.2, "unitPrice": 8280.2}], "quoteNumber": null, "quotes": [{"date": "2026-07-31", "number": "QU00223"}], "saturdayCatchUp": false, "startDate": "2026-09-24", "status": "🟢 On track", "updatedAt": "2026-09-03T00:00:00.000Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "area", "category": "demolition", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["elton"], "dependsOn": [], "durationOverrideDays": 1, "name": "Break wall", "notes": "Duration is an estimate — confirm real m² with Theron.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "area", "category": "ceilings", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": ["t1"], "durationOverrideDays": 2, "name": "Install ceiling", "notes": "Duration is an estimate — confirm real m² with Theron.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "small", "calcType": "unit", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": ["t1", "t4"], "durationOverrideDays": 1, "name": "Install balustrade", "notes": "Balustrade already ordered per spreadsheet To-Do — also needs body corporate approval on the quote first. Duration is an estimate.", "order": 3, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t4": {"blockSizeTier": "small", "calcType": "block", "category": "building", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron"], "dependsOn": [], "durationOverrideDays": 0.25, "name": "Complete balustrade quote & send to body corporate", "notes": "Admin/paperwork task, per Theron (3 Sep) — needs body corporate approval before balustrade install can proceed.", "order": 4, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-7entaa": {"cachedSummary": {"bottleneckCount": 2, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 5, "estimatedCompletionDate": "2026-09-25", "totalWorkingDays": 12}, "code": "7 Entaa", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Kitchen build — 10 carcasses, 8 floating shelves, paint doors/drawer fronts/side panels, then Sergio fits the countertop, oak veneer trim & cladding. Potential start 10 Sep, pending board delivery.", "isEstateJob": true, "order": 0.9, "saturdayCatchUp": false, "startDate": "2026-09-10", "status": "🟠 Waiting on Supplier", "updatedAt": "2026-09-03T16:34:23.563Z", "tasks": {"t1": {"blockSizeTier": "medium", "calcType": "unit", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "elton", "clover", "bourne", "joseph", "theron"], "dependsOn": [], "durationOverrideDays": 5, "name": "Build 10 carcasses", "notes": "Awaiting board delivery, potential start 10/09 per Theron. Whole team on site for this job. Duration adjusted to fit a 10-working-day total — the standard cabinetry rate is per linear m, not per carcass, so this remains a flagged estimate.", "order": 1, "quantity": 10, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "unit", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "elton", "clover", "bourne", "joseph", "theron"], "dependsOn": ["t1"], "durationOverrideDays": 2, "name": "Install 8 floating shelves (big & small)", "notes": "Mix of big and small shelves per Theron. Whole team on site. Duration adjusted to fit a 10-working-day total — still an estimate.", "order": 2, "quantity": 8, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "medium", "calcType": "block", "category": "painting", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "elton", "clover", "bourne", "joseph", "theron"], "dependsOn": [], "durationOverrideDays": 2, "name": "Paint cabinet doors, drawer fronts & side panels", "notes": "14 kitchen cabinet doors + 3 drawer fronts + 4 side panels, per Theron. Whole team on site, running alongside carcass building — not on the critical path. Duration is an estimate.", "order": 3, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t4": {"blockSizeTier": "small", "calcType": "block", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["sergio"], "dependsOn": ["t1", "t2", "t3"], "durationOverrideDays": 1, "name": "Install countertop (Sergio)", "notes": "Sergio always completes this in 1 day — confirmed by Theron, not an estimate.", "order": 4, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t5": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["sergio"], "dependsOn": ["t4"], "durationOverrideDays": 2, "name": "Oak veneer trim work & cladding (900mm x 820mm, oak strips)", "notes": "Real panel size given (900mm x 820mm) but no duration stated by Theron. Duration adjusted to fit a 10-working-day total — confirm with Theron/Sergio.", "order": 5, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-8wr": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 1, "estimatedCompletionDate": "2026-09-08", "totalWorkingDays": 3}, "clientName": "Caren Keen (Two Keens)", "code": "8WR", "createdAt": "2026-09-03T00:00:00.000Z", "description": "8 Whale Rock — build 1 vanity & 2 cupboards, and install", "isEstateJob": true, "order": 0.5, "quoteDate": null, "quoteLineItems": [{"description": "Manufacture & Install Passage/Linen Cupboard", "note": null, "qty": 1, "quoteNumber": "QU00226", "section": "Passage", "total": 4500, "unitPrice": 4500}, {"description": "Prop Countertop, Remove & Replace Floating Vanity", "note": null, "qty": 1, "quoteNumber": "QU00226", "section": "Bathroom 1", "total": 9750, "unitPrice": 9750}, {"description": "Prop Countertop, Remove Vanity, Clean, Waterproof, Reinstall", "note": null, "qty": 1, "quoteNumber": "QU00226", "section": "Bathroom 2", "total": 1875, "unitPrice": 1875}, {"description": "Prop Countertop, Remove & Replace Corner Cabinet", "note": null, "qty": 1, "quoteNumber": "QU00226", "section": "Kitchen", "total": 1285, "unitPrice": 1285}, {"description": "Scrape affected areas, Waterproof, Patch/Plaster & Sand", "note": null, "qty": 20, "quoteNumber": "QU00226", "section": "Waterproof & Paint", "total": 5500, "unitPrice": 275}, {"description": "Paint: Match Paint Colour", "note": null, "qty": 20, "quoteNumber": "QU00226", "section": "Waterproof & Paint", "total": 2100, "unitPrice": 105}], "quoteNumber": null, "quotes": [{"date": "2026-08-07", "number": "QU00226"}], "saturdayCatchUp": false, "startDate": "2026-09-04", "status": "🟢 On track", "updatedAt": "2026-09-03T14:53:55.149Z", "tasks": {"t1": {"blockSizeTier": "medium", "calcType": "unit", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph", "elton"], "dependsOn": [], "durationOverrideDays": 3, "name": "Build 1 vanity & 2 cupboards, and install", "notes": "Per Theron, 3 Sep — starts tomorrow (4 Sep). Duration is an estimate, confirm with Theron.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-95a": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 1, "estimatedCompletionDate": "2026-09-03", "totalWorkingDays": 1}, "code": "95A", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Remedial work — on hold, insurance payout not yet received", "isEstateJob": true, "order": 18, "quoteDate": null, "quoteLineItems": [{"description": "Remove & Dispose Damaged Built in Cupboard: Bedroom", "note": null, "qty": 1, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 9315, "unitPrice": 9315}, {"description": "Repair & Waterproof Damaged Walls", "note": null, "qty": 30, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 7500, "unitPrice": 250}, {"description": "Paint: Bedroom, Landing & Stairs (Incl. Anti-Fungal)", "note": null, "qty": 30, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 3750, "unitPrice": 125}, {"description": "Remove & Dispose Damaged Carpets: Bedroom, Landing, Stairs", "note": null, "qty": 1, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 3850, "unitPrice": 3850}, {"description": "Supply & Install Replacement Carpets", "note": null, "qty": 32, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 16800, "unitPrice": 525}, {"description": "Replace Damaged Cornice: Bathroom, Bedroom", "note": null, "qty": 26, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 1690, "unitPrice": 65}, {"description": "Cornice Labour: Installation, Paint", "note": null, "qty": 26, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 3250, "unitPrice": 125}, {"description": "Replace Damaged Skirting: Bedroom, Landing, Stairs", "note": null, "qty": 30, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 2550, "unitPrice": 85}, {"description": "Skirting Labour: Installation, Fill, Paint", "note": null, "qty": 30, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 4500, "unitPrice": 150}, {"description": "Remove & Replace Damaged Windowsill", "note": null, "qty": 1, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 950, "unitPrice": 950}, {"description": "Remove & Dispose Bathroom Tiles", "note": null, "qty": 1, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 1750, "unitPrice": 1750}, {"description": "Supply Replacement Tiles (Original Style Unavailable) PC", "note": null, "qty": 28, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 7000, "unitPrice": 250}, {"description": "Labour: Tiling", "note": null, "qty": 28, "quoteNumber": "QU00227", "section": "Remedial Work: Water Damage", "total": 5460, "unitPrice": 195}], "quoteNumber": null, "quotes": [{"date": "2026-08-18", "number": "QU00227"}], "saturdayCatchUp": false, "startDate": "2026-09-03", "status": "⚪ On hold (insurance)", "updatedAt": "2026-09-03T16:05:10.250Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "block", "category": "building", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": [], "dependsOn": [], "durationOverrideDays": 1, "name": "Remedial work", "notes": "Blocked until deposit is paid (Castleton). Duration is a placeholder — scope not yet confirmed.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-99a": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 5, "estimatedCompletionDate": "2026-09-09", "totalWorkingDays": 1.8}, "clientName": "Peddzy Makoni", "code": "99A", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Windows — install & fit 2 windows (same process as 33C)", "isEstateJob": true, "order": 11, "quoteDate": null, "quoteLineItems": [{"description": "Main Bedroom Window: 1685 x 1550mm", "note": "after Body Corp contribution", "qty": 1, "quoteNumber": "QU00201", "section": "Window Replacement", "total": 3344.78, "unitPrice": 6689.55}, {"description": "3rd Bedroom Window: 1685 x 980mm", "note": "after Body Corp contribution", "qty": 1, "quoteNumber": "QU00201", "section": "Window Replacement", "total": 2630.63, "unitPrice": 5261.25}, {"description": "Plaster & Paint Reveal", "note": "after Body Corp contribution", "qty": 2, "quoteNumber": "QU00201", "section": "Window Replacement", "total": 500, "unitPrice": 500}], "quoteNumber": null, "quotes": [{"date": "2026-06-08", "number": "QU00201"}], "saturdayCatchUp": false, "startDate": "2026-09-08", "status": "🟢 On track", "updatedAt": "2026-09-03T16:04:49.064Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "block", "category": "building", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": [], "durationOverrideDays": 0.3, "name": "Build scaffolding", "notes": "Same process as 33C, scaled down for 2 windows. Duration is an estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "block", "category": "demolition", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": ["t1"], "durationOverrideDays": 0.3, "name": "Rip out existing windows", "notes": "Same process as 33C, scaled down for 2 windows. Duration is an estimate.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "small", "calcType": "unit", "category": "windows", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": ["t2"], "durationOverrideDays": null, "name": "Install new windows", "notes": "2 windows — duration calculated from the windows rate in Settings. Same process as 33C.", "order": 3, "quantity": 2, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t4": {"blockSizeTier": "small", "calcType": "block", "category": "building", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": ["t3"], "durationOverrideDays": 0.3, "name": "Plaster reveals", "notes": "Same process as 33C, scaled down for 2 windows. Duration is an estimate.", "order": 4, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t5": {"blockSizeTier": "small", "calcType": "area", "category": "painting", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin", "joseph", "clover", "bourne", "elton"], "dependsOn": ["t4"], "durationOverrideDays": 0.5, "name": "Prime & paint reveals", "notes": "Same process as 33C, scaled down for 2 windows. Duration is an estimate — confirm real m² with Theron.", "order": 5, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-drs": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 9, "estimatedCompletionDate": "2026-09-07", "totalWorkingDays": 2}, "code": "DRS", "createdAt": "2026-09-03T00:00:00.000Z", "description": "DRS Motors — build & install the technician's desk; finish paintwork on first desk", "isEstateJob": false, "order": 0.875, "saturdayCatchUp": true, "startDate": "2026-09-05", "status": "🟢 On track", "updatedAt": "2026-09-03T15:22:10.541Z", "tasks": {"t10": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": ["t9"], "durationOverrideDays": 1, "name": "Mop-up — any uncompleted DRS tasks", "notes": "Buffer slot for the Saturday after (12 Sep) in case anything from 5 Sep isn't finished. Heads-up: Stage 1 schedules from dependencies + crew availability, it can't pin a task to a specific non-consecutive date yet — check the computed date lands on 12 Sep and nudge crew/dependencies if it doesn't.", "order": 10, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "area", "category": "painting", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": [], "durationOverrideDays": 0.1, "name": "Finish paintwork — first desk (already built)", "notes": "First desk already built — finishing paintwork only. Per Theron (3 Sep): whole day's work fits in one Saturday.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t3": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": [], "durationOverrideDays": 0.1, "name": "Cut raw materials", "notes": "Technician's desk, second build. Per Theron (3 Sep): whole job fits in one Saturday (5 Sep).", "order": 3, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t4": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": ["t3"], "durationOverrideDays": 0.2, "name": "Construct the frame", "notes": "Technician's desk. Per Theron (3 Sep): whole job fits in one Saturday.", "order": 4, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t5": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": ["t4"], "durationOverrideDays": 0.1, "name": "Install front panel (marine ply)", "notes": "Technician's desk. Per Theron (3 Sep): whole job fits in one Saturday.", "order": 5, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t6": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": ["t5"], "durationOverrideDays": 0.1, "name": "Cut and attach IBR sheeting", "notes": "Technician's desk. Per Theron (3 Sep): whole job fits in one Saturday.", "order": 6, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t7": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": ["t6"], "durationOverrideDays": 0.1, "name": "Cut the countertop and install", "notes": "Technician's desk. Per Theron (3 Sep): whole job fits in one Saturday.", "order": 7, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t8": {"blockSizeTier": "small", "calcType": "area", "category": "painting", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": ["t7"], "durationOverrideDays": 0.2, "name": "Paint", "notes": "Technician's desk. Per Theron (3 Sep): whole job fits in one Saturday.", "order": 8, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t9": {"blockSizeTier": "small", "calcType": "block", "category": "carpentry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["theron", "joseph"], "dependsOn": ["t8"], "durationOverrideDays": 0.1, "name": "Final finishing, filling and sanding", "notes": "Technician's desk. Per Theron (3 Sep): whole job fits in one Saturday.", "order": 9, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-hannes": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 2, "estimatedCompletionDate": "2026-10-05", "totalWorkingDays": 3.5}, "code": "Hannes", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Second kitchen — cabinet build & install, plus a small cabinet for the DB board", "isEstateJob": true, "order": 14, "saturdayCatchUp": false, "startDate": "2026-09-30", "status": "🟢 On track", "updatedAt": "2026-09-03T00:00:00.000Z", "tasks": {"t1": {"blockSizeTier": "medium", "calcType": "unit", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": [], "durationOverrideDays": 3, "name": "Build & install cabinet", "notes": "Due ~30 Sep per spreadsheet. Duration is an estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "block", "category": "cabinetry", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["robin"], "dependsOn": [], "durationOverrideDays": 0.5, "name": "Build small cabinet for DB board, and install", "notes": "Per Theron (3 Sep). Duration is an estimate.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}, "job-santini": {"cachedSummary": {"bottleneckCount": 0, "computedAt": "2026-09-04T06:30:00.000Z", "criticalTaskCount": 2, "estimatedCompletionDate": "2026-09-03", "totalWorkingDays": 1}, "clientName": "Brian Connor", "code": "Santini", "createdAt": "2026-09-03T00:00:00.000Z", "description": "Maintenance list — carpet clean & paint", "isEstateJob": true, "order": 16, "quoteDate": null, "quoteLineItems": [{"description": "Break Out & Dispose Existing Tiles", "note": null, "qty": 1, "quoteNumber": "QU00185-1", "section": "Main Bedroom & Passage Tiling", "total": 2250, "unitPrice": 2250}, {"description": "Tiles: Cyprus Beige Matt 12.96 sqm (Incl. Cuttings)", "note": null, "qty": 23.76, "quoteNumber": "QU00185-1", "section": "Main Bedroom & Passage Tiling", "total": 4989.6, "unitPrice": 210}, {"description": "Tiling per sqm", "note": null, "qty": 21, "quoteNumber": "QU00185-1", "section": "Main Bedroom & Passage Tiling", "total": 4725, "unitPrice": 225}, {"description": "Adhesive & Spacers", "note": null, "qty": 1, "quoteNumber": "QU00185-1", "section": "Main Bedroom & Passage Tiling", "total": 750, "unitPrice": 750}, {"description": "Shipping", "note": null, "qty": 1, "quoteNumber": "QU00185-1", "section": "Main Bedroom & Passage Tiling", "total": 500, "unitPrice": 500}, {"description": "Replace Skirting: Decoline Polymer 70mm", "note": null, "qty": 24, "quoteNumber": "QU00185-1", "section": "Main Bedroom & Passage Tiling", "total": 1800, "unitPrice": 75}, {"description": "Skirting Labour & Adhesive", "note": null, "qty": 24, "quoteNumber": "QU00185-1", "section": "Main Bedroom & Passage Tiling", "total": 1200, "unitPrice": 50}], "quoteNumber": null, "quotes": [{"date": "2026-04-14", "number": "QU00185-1"}], "saturdayCatchUp": false, "startDate": "2026-09-03", "status": "🟢 On track", "updatedAt": "2026-09-03T12:54:27.283Z", "tasks": {"t1": {"blockSizeTier": "small", "calcType": "block", "category": "cleaning", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": [], "dependsOn": [], "durationOverrideDays": 1, "name": "Carpet clean", "notes": "Assigned to Sharel per spreadsheet — not on crew roster. Duration is an estimate.", "order": 1, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}, "t2": {"blockSizeTier": "small", "calcType": "area", "category": "painting", "createdAt": "2026-09-03T00:00:00.000Z", "crewIds": ["clover"], "dependsOn": [], "durationOverrideDays": 1, "name": "Paint", "notes": "Duration is an estimate.", "order": 2, "quantity": null, "subType": "standard", "updatedAt": "2026-09-03T00:00:00.000Z"}}}}};
+
+  function renderSetupNotice(){
+    document.getElementById('shell').outerHTML = `<div style="max-width:640px;margin:56px auto;padding:0 24px 60px;font:15px/1.6 -apple-system,BlinkMacSystemFont,sans-serif;color:#141413;">
+      <div style="font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:12px;color:#8a8677;margin-bottom:10px;">Site Sequence — setup needed</div>
+      <h1 style="font-size:21px;margin:0 0 14px;">Connect this page to a database first</h1>
+      <p>This calculator stores its data in a free Firebase database so it works the same on every device. That connection hasn't been set up in this copy yet.</p>
+      <p>Open <b>README.md</b> in this repository for the full step-by-step (it takes about 10 minutes, no coding involved). In short:</p>
+      <ol style="padding-left:20px;">
+        <li>Create a free project at <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a></li>
+        <li>Enable <b>Firestore Database</b> and <b>Anonymous</b> sign-in under Authentication</li>
+        <li>Copy your project's config values into the <code>firebaseConfig</code> object near the top of <code>index.html</code></li>
+        <li>Save, commit, and push — the page will pick it up on next load</li>
+      </ol>
+      <p style="color:#8a8677;">Everything else about the calculator — jobs, tasks, scheduling, quotes — is unchanged and ready to go the moment this is connected.</p>
+    </div>`;
+  }
+
+
+  /* =========================================================
+     SECTION: Defaults — seed values, mirrors calculation-engine-design.md
+     ========================================================= */
+  const DEFAULT_CALENDAR = {
+    dayStart: "08:30", dayEnd: "16:00", lunchMinutes: 30, productiveHoursPerDay: 7,
+    workingDays: [1,2,3,4,5],
+    holidays: ["2026-12-25","2026-12-26","2027-01-01"],
+  };
+
+  const DEFAULT_RATES = {
+    categories: {
+      tiling:      { label:"Tiling", defaultCalcType:"area", groupForEfficiency:"confined", unit:"m²", baseRatePerDay:12.5,
+        subTypes:{ standard:{label:"Standard ceramic/porcelain",multiplier:1.0}, large_format:{label:"Large-format",multiplier:0.85},
+                   mosaic:{label:"Mosaic",multiplier:2.0}, subway:{label:"Subway/brick",multiplier:1.3},
+                   herringbone:{label:"Herringbone/patterned/complex",multiplier:2.75} } },
+      flooring:    { label:"Flooring", defaultCalcType:"area", groupForEfficiency:"confined", unit:"m²", baseRatePerDay:25,
+        subTypes:{ standard:{label:"Standard/laminate/vinyl",multiplier:1.0}, engineered_timber:{label:"Engineered timber",multiplier:1.2},
+                   solid_timber:{label:"Solid timber",multiplier:1.35}, herringbone_chevron:{label:"Herringbone/chevron",multiplier:2.0} } },
+      demolition:   { label:"Demolition/strip-out", defaultCalcType:"area", groupForEfficiency:"open", unit:"m²", baseRatePerDay:25,
+        subTypes:{ standard:{label:"Standard",multiplier:1.0} } },
+      building:     { label:"Building work", defaultCalcType:"area", groupForEfficiency:"open", unit:"m²", baseRatePerDay:8,
+        subTypes:{ standard:{label:"Standard",multiplier:1.0} } },
+      waterproofing:{ label:"Waterproofing", defaultCalcType:"area", groupForEfficiency:"confined", unit:"m²", baseRatePerDay:25,
+        subTypes:{ standard:{label:"Membrane application",multiplier:1.0} } },
+      ceilings:     { label:"Ceilings", defaultCalcType:"area", groupForEfficiency:"open", unit:"m²", baseRatePerDay:15,
+        subTypes:{ standard:{label:"Suspended/drywall",multiplier:1.0} } },
+      painting:     { label:"Painting", defaultCalcType:"area", groupForEfficiency:"open", unit:"m²", baseRatePerDay:70,
+        subTypes:{ standard:{label:"Standard 2-coat",multiplier:1.0} } },
+      plumbing:     { label:"Plumbing", defaultCalcType:"unit", groupForEfficiency:"specialist", unit:"point", timePerUnitDays:0.5,
+        subTypes:{ standard:{label:"Rough-in / fit-off",multiplier:1.0} } },
+      electrical:   { label:"Electrical", defaultCalcType:"unit", groupForEfficiency:"specialist", unit:"point", timePerUnitDays:0.4,
+        subTypes:{ standard:{label:"Rough-in / fit-off",multiplier:1.0} } },
+      cabinetry:    { label:"Cabinetry", defaultCalcType:"unit", groupForEfficiency:"confined", unit:"linear m", timePerUnitDays:1,
+        subTypes:{ standard:{label:"Built-in, build + install",multiplier:1.0} } },
+      doors:        { label:"Doors", defaultCalcType:"unit", groupForEfficiency:"open", unit:"door", timePerUnitDays:0.5,
+        subTypes:{ standard:{label:"Hang + hardware",multiplier:1.0} } },
+      windows:      { label:"Windows", defaultCalcType:"unit", groupForEfficiency:"open", unit:"window", timePerUnitDays:0.5,
+        subTypes:{ standard:{label:"Install",multiplier:1.0} } },
+      fixtures:     { label:"Fixtures & Fittings", defaultCalcType:"unit", groupForEfficiency:"open", unit:"item", timePerUnitDays:0.15,
+        subTypes:{ standard:{label:"Taps, mirrors, light fittings",multiplier:1.0} } },
+      carpentry:    { label:"Carpentry", defaultCalcType:"block", groupForEfficiency:"open", blockDaysByTier:{small:1,medium:2.5,large:5},
+        subTypes:{ standard:{label:"General joinery",multiplier:1.0} } },
+      cleaning:     { label:"Cleaning", defaultCalcType:"block", groupForEfficiency:"open", blockDaysByTier:{small:1,medium:1,large:2},
+        subTypes:{ standard:{label:"Standard",multiplier:1.0} } },
+      snagging:     { label:"Final snagging", defaultCalcType:"block", groupForEfficiency:"open", blockDaysByTier:{small:1,medium:1,large:2},
+        subTypes:{ standard:{label:"Standard",multiplier:1.0} } },
+    },
+    blockSizeTierThresholds:{ smallMaxDays:5, mediumMaxDays:15 },
+  };
+
+  const DEFAULT_CREW_RULES = {
+    efficiencyCurves:{
+      confined:  {1:1.0, 2:1.65, 3:1.65},
+      open:      {1:1.0, 2:1.9,  3:2.7},
+      specialist:{1:1.0, 2:1.0,  3:1.0},
+    },
+    generalistPenalty: 0.8,
+    bottleneckSlackThresholdDays: 1,
+  };
+
+  const DEFAULT_CREW = [
+    { name:"Robin",    role:"foreman",       tradeTags:["cabinetry","doors","windows","carpentry","building"] },
+    { name:"Lallie",   role:"labourer",      tradeTags:["tiling","flooring"] },
+    { name:"Elton",    role:"labourer",      tradeTags:["general"] },
+    { name:"Clover",   role:"labourer",      tradeTags:["general"] },
+    { name:"Schoolboy",role:"labourer",      tradeTags:["general"] },
+    { name:"Blessing", role:"subcontractor", tradeTags:["electrical"] },
+  ];
+
+  const CATEGORY_ORDER = ["demolition","building","plumbing","electrical","waterproofing","tiling","flooring",
+    "painting","ceilings","carpentry","cabinetry","doors","windows","fixtures","cleaning","snagging"];
+
+  // Local-calendar-day formatter. Deliberately NOT toISOString().slice(0,10) — that
+  // converts through UTC, and in a timezone ahead of UTC (e.g. Africa/Johannesburg,
+  // UTC+2) a local midnight Date lands at 22:00 the previous day in UTC, silently
+  // shifting every calendar date back by one day (a Monday finish gets labelled
+  // Sunday). Using the Date object's own local year/month/day keeps the label
+  // matching the same local day used for day-of-week checks.
+  function localISODate(d){
+    const dt = d || new Date();
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth()+1).padStart(2,'0');
+    const day = String(dt.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
+  // A job is treated as an estate job unless explicitly marked otherwise — estates
+  // have body-corporate noise rules that ban weekend work outright, so that's the
+  // safe default. Saturday catch-up only ever applies to a job explicitly flagged
+  // as non-estate (confirmed case: DRS Motors, a business premises).
+  function jobAllowsWeekendCatchUp(job){
+    const isEstate = job.isEstateJob !== false;
+    return !isEstate && !!job.saturdayCatchUp;
+  }
+
+  /* =========================================================
+     SECTION: DataAccess — wraps every db call
+     ========================================================= */
+  const DataAccess = (function(){
+    let dbPromise = null;
+    function getDb(){
+      if (!dbPromise){
+        dbPromise = new Promise(resolve=>{
+          if (typeof firebase === 'undefined' || !FIREBASE_CONFIGURED){ resolve(null); return; }
+          try{
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            firebase.auth().signInAnonymously()
+              .then(()=> resolve(firebase.firestore()))
+              .catch(err=>{ console.error('Firebase auth error', err); resolve(null); });
+          }catch(err){ console.error('Firebase init error', err); resolve(null); }
+        });
+      }
+      return dbPromise;
+    }
+
+    // One-time bootstrap: if this Firestore database is empty, load Theron's real
+    // jobs/crew/settings (captured from the original Claude artifact) so the standalone
+    // page opens with real data instead of a blank slate. Never overwrites existing data.
+    async function maybeImportSeedData(){
+      const db = await getDb();
+      if (!db || typeof SEED_DATA === 'undefined') return;
+      try{
+        const existing = await db.collection('jobs').limit(1).get();
+        if (!existing.empty) return;
+        const batch = db.batch();
+        Object.entries(SEED_DATA.settings||{}).forEach(([id, data])=>{ batch.set(db.doc('settings/'+id), data); });
+        Object.entries(SEED_DATA.crew||{}).forEach(([id, data])=>{ batch.set(db.doc('crew/'+id), data); });
+        Object.entries(SEED_DATA.jobs||{}).forEach(([id, job])=>{
+          const jobFields = Object.assign({}, job);
+          const tasks = jobFields.tasks; delete jobFields.tasks;
+          batch.set(db.doc('jobs/'+id), jobFields);
+          Object.entries(tasks||{}).forEach(([tid, tdata])=>{ batch.set(db.doc('jobs/'+id+'/tasks/'+tid), tdata); });
+        });
+        await batch.commit();
+        console.log('Site Sequence: imported starter data into empty database.');
+      }catch(e){ console.error('Seed import failed', e); }
+    }
+
+    async function ensureSeeded(){
+      const db = await getDb();
+      if (!db) return false;
+      try{
+        const ratesSnap = await db.doc('settings/rates').get();
+        if (!ratesSnap.exists){
+          await db.doc('settings/calendar').set({...DEFAULT_CALENDAR, updatedAt:new Date().toISOString()});
+          await db.doc('settings/rates').set({...DEFAULT_RATES, updatedAt:new Date().toISOString()});
+          await db.doc('settings/crewRules').set({...DEFAULT_CREW_RULES, updatedAt:new Date().toISOString()});
+        }
+        const crewSnap = await db.collection('crew').limit(1).get();
+        if (crewSnap.empty){
+          for (const c of DEFAULT_CREW){ await db.collection('crew').add({...c, active:true, createdAt:new Date().toISOString()}); }
+        }
+      }catch(e){ console.error('seed error', e); }
+      return true;
+    }
+
+    function watchSettings(cb){
+      const unsubs = [];
+      let cal=null, rates=null, crewRules=null;
+      function fire(){ if(cal&&rates&&crewRules) cb({calendar:cal, rates:rates, crewRules:crewRules}); }
+      getDb().then(db=>{
+        if(!db) return;
+        unsubs.push(db.doc('settings/calendar').onSnapshot(s=>{ cal=s.exists?s.data():DEFAULT_CALENDAR; fire(); }));
+        unsubs.push(db.doc('settings/rates').onSnapshot(s=>{ rates=s.exists?s.data():DEFAULT_RATES; fire(); }));
+        unsubs.push(db.doc('settings/crewRules').onSnapshot(s=>{ crewRules=s.exists?s.data():DEFAULT_CREW_RULES; fire(); }));
+      });
+      return ()=>unsubs.forEach(u=>u());
+    }
+
+    function watchCrew(cb){
+      let unsub=()=>{};
+      getDb().then(db=>{
+        if(!db) return;
+        unsub = db.collection('crew').onSnapshot(snap=>{
+          cb(snap.docs.map(d=>({id:d.id, ...d.data()})));
+        });
+      });
+      return ()=>unsub();
+    }
+
+    function watchJobs(cb){
+      let unsub=()=>{};
+      getDb().then(db=>{
+        if(!db) return;
+        unsub = db.collection('jobs').onSnapshot(snap=>{
+          cb(snap.docs.map(d=>({id:d.id, ...d.data()})));
+        });
+      });
+      return ()=>unsub();
+    }
+
+    function watchTasks(jobId, cb){
+      let unsub=()=>{};
+      getDb().then(db=>{
+        if(!db) return;
+        unsub = db.collection('jobs/'+jobId+'/tasks').onSnapshot(snap=>{
+          cb(snap.docs.map(d=>({id:d.id, ...d.data()})));
+        });
+      });
+      return ()=>unsub();
+    }
+
+    async function createJob(data){ const db=await getDb(); if(!db) return null; return db.collection('jobs').add({...data, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}); }
+    async function saveJob(id, data){ const db=await getDb(); if(!db) return; try{ await db.doc('jobs/'+id).update({...data, updatedAt:new Date().toISOString()}); }catch(e){ console.error(e); } }
+    async function deleteJob(id){ const db=await getDb(); if(!db) return; try{ await db.doc('jobs/'+id).delete(); }catch(e){ console.error(e); } }
+
+    async function createTask(jobId, data){ const db=await getDb(); if(!db) return null; return db.collection('jobs/'+jobId+'/tasks').add({...data, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}); }
+    async function saveTask(jobId, id, data){ const db=await getDb(); if(!db) return; try{ await db.doc('jobs/'+jobId+'/tasks/'+id).update({...data, updatedAt:new Date().toISOString()}); }catch(e){ console.error(e); } }
+    async function deleteTask(jobId, id){ const db=await getDb(); if(!db) return; try{ await db.doc('jobs/'+jobId+'/tasks/'+id).delete(); }catch(e){ console.error(e); } }
+
+    async function saveSettingsDoc(name, data){ const db=await getDb(); if(!db) return; try{ await db.doc('settings/'+name).update({...data, updatedAt:new Date().toISOString()}); }catch(e){ console.error(e); } }
+    async function saveCrewMember(id, data){ const db=await getDb(); if(!db) return; try{ await db.doc('crew/'+id).update(data); }catch(e){ console.error(e); } }
+    async function addCrewMember(data){ const db=await getDb(); if(!db) return; try{ await db.collection('crew').add({...data, active:true, createdAt:new Date().toISOString()}); }catch(e){ console.error(e); } }
+    async function removeCrewMember(id){ const db=await getDb(); if(!db) return; try{ await db.doc('crew/'+id).delete(); }catch(e){ console.error(e); } }
+
+    async function getAllTasksOnce(jobIds){
+      const db = await getDb();
+      const out = {};
+      if (!db) return out;
+      await Promise.all(jobIds.map(async id=>{
+        try{
+          const snap = await db.collection('jobs/'+id+'/tasks').get();
+          out[id] = snap.docs.map(d=>({id:d.id, ...d.data()}));
+        }catch(e){ out[id] = []; }
+      }));
+      return out;
+    }
+
+    return { getDb, maybeImportSeedData, ensureSeeded, watchSettings, watchCrew, watchJobs, watchTasks,
+      createJob, saveJob, deleteJob, createTask, saveTask, deleteTask,
+      saveSettingsDoc, saveCrewMember, addCrewMember, removeCrewMember, getAllTasksOnce };
+  })();
+
+  /* =========================================================
+     SECTION: Scheduler — pure functions, no db references
+     ========================================================= */
+  const Scheduler = (function(){
+
+    function resolveMultiplier(task, catDef){
+      if (task.multiplierOverride != null && task.multiplierOverride !== "") return Number(task.multiplierOverride);
+      const st = catDef && catDef.subTypes && catDef.subTypes[task.subType];
+      return st ? st.multiplier : 1.0;
+    }
+
+    function effortPersonDays(task, catDef){
+      const mult = resolveMultiplier(task, catDef);
+      const qty = Number(task.quantity)||0;
+      switch(task.calcType){
+        case "area": return catDef.baseRatePerDay ? (qty / catDef.baseRatePerDay) * mult : 0;
+        case "unit": return (catDef.timePerUnitDays||0) * qty * mult;
+        case "block": return (catDef.blockDaysByTier && catDef.blockDaysByTier[task.blockSizeTier]) || 1;
+        case "fixed": return null;
+        default: return 0;
+      }
+    }
+
+    function crewEfficiencyMultiplier(task, catDef, crewById, crewRules){
+      const ids = task.crewIds||[];
+      const n = ids.length || 1;
+      const group = (catDef && catDef.groupForEfficiency) || "open";
+      const curve = (crewRules.efficiencyCurves && crewRules.efficiencyCurves[group]) || {1:1,2:1,3:1};
+      const groupMult = curve[Math.min(n,3)] != null ? curve[Math.min(n,3)] : 1;
+      if (ids.length === 0) return 1;
+      let weight = 0;
+      ids.forEach(id=>{
+        const m = crewById[id];
+        const matches = m && Array.isArray(m.tradeTags) && m.tradeTags.includes(task.category);
+        weight += matches ? 1 : (crewRules.generalistPenalty != null ? crewRules.generalistPenalty : 0.8);
+      });
+      return groupMult * (weight / n);
+    }
+
+    function taskDurationDays(task, catDef, crewById, crewRules){
+      if (task.durationOverrideDays != null && task.durationOverrideDays !== ""){
+        return Number(task.durationOverrideDays);
+      }
+      const effort = effortPersonDays(task, catDef||{});
+      if (effort == null) return 1; // fixed task with no override entered yet — default 1 day placeholder
+      const eff = crewEfficiencyMultiplier(task, catDef||{}, crewById, crewRules);
+      return effort / (eff || 1);
+    }
+
+    function isoDate(d){ return localISODate(d); }
+
+    function buildWorkingCalendar(startDateStr, neededWorkingDays, calSettings, saturdayCatchUp){
+      const workingDaysSet = new Set(calSettings.workingDays || [1,2,3,4,5]);
+      const holidays = new Set(calSettings.holidays || []);
+      const dates = [];
+      let d = new Date((startDateStr||isoDate(new Date())) + "T00:00:00");
+      let guard = 0;
+      const need = Math.max(10, neededWorkingDays + 5);
+      while (dates.length < need && guard < 8000){
+        guard++;
+        const dow = d.getDay();
+        const iso = isoDate(d);
+        const isWorking = workingDaysSet.has(dow) || (saturdayCatchUp && dow === 6);
+        if (isWorking && !holidays.has(iso)) dates.push(iso);
+        d = new Date(d.getTime() + 86400000);
+      }
+      return dates;
+    }
+
+    function dayOffsetToDate(offsetDays, calendarDates, isCompletion){
+      if (offsetDays == null || !calendarDates.length) return null;
+      const idx = isCompletion ? Math.max(0, Math.ceil(offsetDays) - 1) : Math.floor(offsetDays);
+      return calendarDates[Math.min(idx, calendarDates.length - 1)];
+    }
+
+    function computeSchedule(tasks, crewById, settings, jobStartDateStr, saturdayCatchUp){
+      if (!tasks.length){
+        return { perTask:{}, projectFinishDays:0, completionDate:jobStartDateStr, criticalTaskIds:[], bottleneckTaskIds:[] };
+      }
+      const rates = settings.rates || DEFAULT_RATES;
+      const crewRules = settings.crewRules || DEFAULT_CREW_RULES;
+      const byId = {}; tasks.forEach(t=>byId[t.id]=t);
+
+      tasks.forEach(t=>{ t._dur = Math.max(0.01, taskDurationDays(t, rates.categories[t.category], crewById, crewRules)); });
+
+      const indegCopy = {}; tasks.forEach(t=>indegCopy[t.id]=0);
+      const successors = {}; tasks.forEach(t=>successors[t.id]=[]);
+      tasks.forEach(t=>(t.dependsOn||[]).forEach(d=>{ if(byId[d]){ indegCopy[t.id]++; successors[d].push(t.id); } }));
+
+      const queue = tasks.filter(t=>indegCopy[t.id]===0).map(t=>t.id);
+      const topo = [];
+      const q = queue.slice();
+      while(q.length){ const id=q.shift(); topo.push(id); successors[id].forEach(s=>{ indegCopy[s]--; if(indegCopy[s]===0) q.push(s); }); }
+      if (topo.length !== tasks.length){
+        return { error:"cycle", message:"Task dependencies form a loop — fix before this job can be scheduled." };
+      }
+
+      topo.forEach(id=>{
+        const t = byId[id]; const deps=(t.dependsOn||[]).filter(d=>byId[d]);
+        t._ES = deps.length ? Math.max.apply(null, deps.map(d=>byId[d]._EF)) : 0;
+        t._EF = t._ES + t._dur;
+      });
+      const projFinishUnconstrained = Math.max.apply(null, [0].concat(tasks.map(t=>t._EF)));
+      topo.slice().reverse().forEach(id=>{
+        const t = byId[id]; const succ = successors[id];
+        t._LF = succ.length ? Math.min.apply(null, succ.map(s=>byId[s]._LS)) : projFinishUnconstrained;
+        t._LS = t._LF - t._dur;
+      });
+      tasks.forEach(t=>{ t._slackUnconstrained = t._LS - t._ES; });
+
+      const crewFreeAt = {};
+      const RS={}, RF={};
+      const remainingDeps = {}; tasks.forEach(t=>remainingDeps[t.id]=(t.dependsOn||[]).filter(d=>byId[d]).length);
+      let eligible = tasks.filter(t=>remainingDeps[t.id]===0).map(t=>t.id);
+      const scheduledOrder = [];
+      while(eligible.length){
+        eligible.sort((a,b)=>{
+          const ta=byId[a], tb=byId[b];
+          if (ta._slackUnconstrained !== tb._slackUnconstrained) return ta._slackUnconstrained - tb._slackUnconstrained;
+          if (ta._ES !== tb._ES) return ta._ES - tb._ES;
+          return (ta.order||0)-(tb.order||0);
+        });
+        const id = eligible.shift();
+        const t = byId[id];
+        const deps = (t.dependsOn||[]).filter(d=>byId[d]);
+        const depReady = deps.length ? Math.max.apply(null, deps.map(d=>RF[d])) : 0;
+        const crewIds = t.crewIds||[];
+        const crewReady = crewIds.length ? Math.max.apply(null, crewIds.map(c=>crewFreeAt[c]||0)) : 0;
+        const rs = Math.max(depReady, crewReady);
+        const rf = rs + t._dur;
+        RS[id]=rs; RF[id]=rf;
+        crewIds.forEach(c=>{ crewFreeAt[c]=rf; });
+        scheduledOrder.push(id);
+        successors[id].forEach(s=>{ remainingDeps[s]--; if(remainingDeps[s]===0) eligible.push(s); });
+      }
+      const projectFinish = Math.max.apply(null, [0].concat(tasks.map(t=>RF[t.id])));
+
+      const formalEdge = {}; tasks.forEach(t=>(t.dependsOn||[]).forEach(d=>{ if(byId[d]) formalEdge[d+'>'+t.id]=true; }));
+      const implicitSucc = {}; tasks.forEach(t=>implicitSucc[t.id]=[]);
+      const byCrew = {};
+      tasks.forEach(t=>(t.crewIds||[]).forEach(c=>{ (byCrew[c]=byCrew[c]||[]).push(t.id); }));
+      Object.keys(byCrew).forEach(c=>{
+        const sorted = byCrew[c].slice().sort((a,b)=>RS[a]-RS[b]);
+        for(let i=0;i<sorted.length-1;i++){
+          const a=sorted[i], b=sorted[i+1];
+          if (Math.abs(RF[a]-RS[b]) < 1e-6 && !formalEdge[a+'>'+b]) implicitSucc[a].push(b);
+        }
+      });
+      const allSucc = {}; tasks.forEach(t=>{ allSucc[t.id] = successors[t.id].concat(implicitSucc[t.id]); });
+
+      const LF={}, LS={}, slack={};
+      scheduledOrder.slice().reverse().forEach(id=>{
+        const succ = allSucc[id];
+        LF[id] = succ.length ? Math.min.apply(null, succ.map(s=>LS[s])) : projectFinish;
+        LS[id] = LF[id] - byId[id]._dur;
+        slack[id] = LS[id] - RS[id];
+      });
+
+      const EPS = 0.01;
+      const bottleneckThreshold = (crewRules.bottleneckSlackThresholdDays!=null) ? crewRules.bottleneckSlackThresholdDays : 1;
+      const calendar = buildWorkingCalendar(jobStartDateStr, Math.ceil(projectFinish), settings.calendar||DEFAULT_CALENDAR, saturdayCatchUp);
+
+      const perTask = {};
+      tasks.forEach(t=>{
+        const catDef = (rates.categories||{})[t.category] || {};
+        const isSpecialist = catDef.groupForEfficiency === "specialist";
+        const hasSub = (t.crewIds||[]).some(id=> crewById[id] && crewById[id].role === "subcontractor");
+        const isGenPenalized = (t.crewIds||[]).some(id=>{
+          const m = crewById[id];
+          return m && Array.isArray(m.tradeTags) && !m.tradeTags.includes(t.category);
+        });
+        perTask[t.id] = {
+          durationDays: t._dur, RS:RS[t.id], RF:RF[t.id], LS:LS[t.id], LF:LF[t.id], slack:slack[t.id],
+          isCritical: slack[t.id] <= EPS,
+          isNearCritical: slack[t.id] > EPS && slack[t.id] <= bottleneckThreshold,
+          isSubcontractor: hasSub, isSpecialistSingleOperator: isSpecialist, isGeneralistPenalized: isGenPenalized,
+          calendarStart: dayOffsetToDate(RS[t.id], calendar, false),
+          calendarFinish: dayOffsetToDate(RF[t.id], calendar, true),
+        };
+      });
+
+      return {
+        perTask, projectFinishDays: projectFinish,
+        completionDate: dayOffsetToDate(projectFinish, calendar, true),
+        criticalTaskIds: tasks.filter(t=>perTask[t.id].isCritical).map(t=>t.id),
+        bottleneckTaskIds: tasks.filter(t=>perTask[t.id].isNearCritical || perTask[t.id].isSubcontractor || perTask[t.id].isSpecialistSingleOperator).map(t=>t.id),
+      };
+    }
+
+    return { taskDurationDays, computeSchedule, buildWorkingCalendar, dayOffsetToDate };
+  })();
+
+  /* =========================================================
+     SECTION: Risks — cross-job bottleneck & double-booking scan
+     ========================================================= */
+  function computeRisksList(jobs, tasksByJobId, crewById, settings){
+    const risks = [];
+    const scheduleByJob = {};
+
+    jobs.forEach(job=>{
+      const tasks = tasksByJobId[job.id] || [];
+      if (!tasks.length) return;
+      const sched = Scheduler.computeSchedule(tasks, crewById, settings, job.startDate, jobAllowsWeekendCatchUp(job));
+      if (sched.error){ risks.push({ code: job.code||'—', group: job.code||'—', text: 'Task dependency loop — fix in job', severity:'critical' }); return; }
+      scheduleByJob[job.id] = { job, tasks, sched };
+    });
+
+    const today = localISODate();
+    const NOTICE_WINDOW_DAYS = 10; // only surface "no crew yet" noise for jobs starting soon
+
+    jobs.forEach(job=>{
+      const status = job.status || '';
+      if (/waiting|hold/i.test(status)){
+        const short = status.replace(/^\S+\s*/,'').trim();
+        risks.push({ code: job.code||'—', group: job.code||'—', text: short || 'Blocked', severity:'warn' });
+      }
+      if (job.isEstateJob !== false && job.saturdayCatchUp){
+        risks.push({ code: job.code||'—', group: job.code||'—', text: 'Estate job with Saturday catch-up enabled — noise rules don\'t allow this', severity:'critical' });
+      }
+    });
+
+    Object.values(scheduleByJob).forEach(({job, tasks, sched})=>{
+      tasks.forEach(t=>{
+        const p = sched.perTask[t.id];
+        if (!p) return;
+        if (!t.crewIds || !t.crewIds.length){
+          const startsSoon = p.calendarStart && (new Date(p.calendarStart+'T00:00:00') - new Date(today+'T00:00:00')) <= NOTICE_WINDOW_DAYS*86400000;
+          if (startsSoon){
+            risks.push({ code: job.code||'—', group: job.code||'—', text: `${t.name} — no crew assigned`, severity:'warn' });
+          }
+        } else if (p.isSubcontractor && p.isCritical){
+          risks.push({ code: job.code||'—', group: job.code||'—', text: `${t.name} — subcontractor on critical path`, severity:'critical' });
+        }
+      });
+    });
+
+    const bookings = [];
+    Object.values(scheduleByJob).forEach(({job, tasks, sched})=>{
+      tasks.forEach(t=>{
+        const p = sched.perTask[t.id];
+        if (!p || !p.calendarStart || !p.calendarFinish) return;
+        (t.crewIds||[]).forEach(cid=>{
+          bookings.push({ crewId: cid, jobId: job.id, jobCode: job.code||'—', start: p.calendarStart, finish: p.calendarFinish });
+        });
+      });
+    });
+    const byCrew = {};
+    bookings.forEach(b=>{ (byCrew[b.crewId] = byCrew[b.crewId] || []).push(b); });
+    const seenPairs = new Set();
+    Object.entries(byCrew).forEach(([cid, list])=>{
+      for (let i=0;i<list.length;i++){
+        for (let j=i+1;j<list.length;j++){
+          const a=list[i], b=list[j];
+          if (a.jobId === b.jobId) continue;
+          if (!(a.start <= b.finish && b.start <= a.finish)) continue;
+          const pairKey = cid+'|'+[a.jobCode,b.jobCode].sort().join('/');
+          if (seenPairs.has(pairKey)) continue;
+          seenPairs.add(pairKey);
+          const name = (crewById[cid] && crewById[cid].name) || cid;
+          risks.push({ code: `${a.jobCode} / ${b.jobCode}`, group: 'Crew conflicts', text: `${name} double-booked — ${a.jobCode} & ${b.jobCode}`, severity:'critical' });
+        }
+      }
+    });
+
+    risks.sort((a,b)=> (a.severity==='critical'?0:1) - (b.severity==='critical'?0:1));
+    return risks;
+  }
+
+  /* =========================================================
+     SECTION: Sample data — shown only when db is unavailable
+     ========================================================= */
+  const SAMPLE_CREW = DEFAULT_CREW.map((c,i)=>({id:'sample-crew-'+i, ...c}));
+  const SAMPLE_JOBS = [
+    { id:'sample-job-1', code:'29A', description:'Patio tiling, floors & paint', status:'🟢 On track', startDate: localISODate(), isEstateJob:false, saturdayCatchUp:true,
+      cachedSummary:{ totalWorkingDays:9.2, estimatedCompletionDate: localISODate(new Date(Date.now()+9*86400000)), criticalTaskCount:3, bottleneckCount:1 } },
+  ];
+  const SAMPLE_TASKS = [
+    { id:'st1', name:'Break existing patio tile', category:'demolition', calcType:'area', quantity:14, subType:'standard', crewIds:['sample-crew-2'], dependsOn:[], order:1 },
+    { id:'st2', name:'Patio floor tiling', category:'tiling', calcType:'area', quantity:14, subType:'standard', crewIds:['sample-crew-1'], dependsOn:['st1'], order:2 },
+    { id:'st3', name:'Paint touch-up', category:'painting', calcType:'area', quantity:22, subType:'standard', crewIds:['sample-crew-3'], dependsOn:[], order:3 },
+  ];
+
+  /* =========================================================
+     SECTION: UI — render functions
+     ========================================================= */
+  const UI = (function(){
+
+    function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function fmtDate(iso){ if(!iso) return '—'; const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'}); }
+    function fmtDays(n){ if(n==null) return '—'; return (Math.round(n*10)/10)+'d'; }
+
+    function statusPillClass(status){
+      if(!status) return 'neutral';
+      if(status.includes('🔴')||/delay/i.test(status)) return 'crit';
+      if(status.includes('🟠')||status.includes('🟡')) return 'warn';
+      if(status.includes('🟢')||status.includes('✅')) return 'good';
+      return 'neutral';
+    }
+
+    function renderRiskLines(list){
+      return list.map(r=>`<div class="riskrow">
+          <span class="riskdot ${r.severity==='critical'?'dot-critical':'dot-warn'}"></span>
+          <span class="risktext">${escapeHtml(r.text)}</span>
+        </div>`).join('');
+    }
+
+    function renderRisksBlock(risks, expanded){
+      if (!risks || !risks.length) return '';
+      const groups = {};
+      risks.forEach(r=>{ const g = r.group||r.code||'—'; (groups[g]=groups[g]||[]).push(r); });
+      const groupEntries = Object.entries(groups).map(([code, list])=>({
+        code, list, hasCritical: list.some(r=>r.severity==='critical'),
+      }));
+      groupEntries.sort((a,b)=> (a.hasCritical===b.hasCritical) ? a.code.localeCompare(b.code) : (a.hasCritical?-1:1));
+
+      const criticalGroups = groupEntries.filter(g=>g.hasCritical);
+      const warnGroups = groupEntries.filter(g=>!g.hasCritical);
+      const warnCount = warnGroups.reduce((s,g)=>s+g.list.length,0);
+
+      const groupHtml = g => `<div class="riskgroup">
+          <div class="riskgroup-code mono">${escapeHtml(g.code)}</div>
+          <div class="riskgroup-lines">${renderRiskLines(g.list)}</div>
+        </div>`;
+
+      const shown = criticalGroups.concat(expanded ? warnGroups : []);
+      const toggle = warnGroups.length ? (expanded
+        ? `<button class="risktoggle" data-action="toggle-risks">Show fewer</button>`
+        : `<button class="risktoggle" data-action="toggle-risks">Show ${warnCount} more (${warnGroups.length} job${warnGroups.length===1?'':'s'})</button>`
+      ) : '';
+
+      if (!shown.length && !toggle) return '';
+      return `<div class="card riskblock">
+        <div class="riskhead"><span>Potential issues &amp; risks</span>${toggle}</div>
+        <div class="riskgroups">${shown.length ? shown.map(groupHtml).join('') : `<div class="risktext" style="font-size:12.5px;">Nothing urgent — ${warnCount} lower-priority item${warnCount===1?'':'s'} hidden above.</div>`}</div>
+      </div>`;
+    }
+
+    function jobBarClass(status){
+      const cls = statusPillClass(status);
+      return cls==='crit' ? 'bar-crit' : cls==='warn' ? 'bar-warn' : cls==='good' ? 'bar-good' : 'bar-neutral';
+    }
+
+    function renderPortfolioGantt(jobs){
+      const scheduled = jobs.filter(j=>j.startDate && j.cachedSummary && j.cachedSummary.estimatedCompletionDate);
+      const unscheduled = jobs.length - scheduled.length;
+      if (!scheduled.length) return '';
+
+      const toTime = iso => new Date(iso+'T00:00:00').getTime();
+      let minStart = Math.min.apply(null, scheduled.map(j=>toTime(j.startDate)));
+      let maxFinish = Math.max.apply(null, scheduled.map(j=>toTime(j.cachedSummary.estimatedCompletionDate)));
+      const todayMs = toTime(localISODate());
+      minStart = Math.min(minStart, todayMs);
+      maxFinish = Math.max(maxFinish, todayMs + 86400000);
+      const span = Math.max(1, maxFinish - minStart);
+      const todayPct = ((todayMs - minStart) / span * 100).toFixed(2);
+
+      const PINNED_LAST = ['santini','70a','95a'];
+      const isPinnedLast = j => PINNED_LAST.includes(String(j.code||'').toLowerCase());
+      const rows = scheduled.slice()
+        .sort((a,b)=>{
+          const pa = isPinnedLast(a), pb = isPinnedLast(b);
+          if (pa !== pb) return pa ? 1 : -1;
+          return toTime(a.startDate) - toTime(b.startDate);
+        })
+        .map(j=>{
+          const start = toTime(j.startDate);
+          const finish = Math.max(start + 43200000, toTime(j.cachedSummary.estimatedCompletionDate));
+          const left = ((start - minStart) / span * 100).toFixed(2);
+          const width = Math.max(1.2, ((finish - start) / span * 100)).toFixed(2);
+          const daysLabel = fmtDays(j.cachedSummary.totalWorkingDays);
+          const fitsInside = parseFloat(width) >= 7;
+          const labelHtml = fitsInside
+            ? `<span class="gantt-bar-label in">${daysLabel}</span>`
+            : `<span class="gantt-bar-label out" style="left:${(parseFloat(left)+parseFloat(width)).toFixed(2)}%;">${daysLabel}</span>`;
+          return `<div class="gantt-row" data-action="open-job" data-id="${j.id}">
+            <div class="lbl">${escapeHtml(j.code||'—')}<small>${escapeHtml(j.clientName||j.description||'')}</small></div>
+            <div class="gantt-track" title="${fmtDate(j.startDate)} → ${fmtDate(j.cachedSummary.estimatedCompletionDate)}">
+              <div class="gantt-bar ${jobBarClass(j.status)}" style="left:${left}%;width:${width}%;">${fitsInside ? labelHtml : ''}</div>
+              ${fitsInside ? '' : labelHtml}
+              <div class="gantt-today" style="left:${todayPct}%;"></div>
+            </div>
+          </div>`;
+        }).join('');
+
+      return `<div class="card ganttcard">
+        <h2>Portfolio timeline</h2>
+        <div class="gantt-scale"><span>${fmtDate(localISODate(new Date(minStart)))}</span><span>${fmtDate(localISODate(new Date(maxFinish)))}</span></div>
+        <div class="gantt-rows">${rows}</div>
+        ${unscheduled ? `<div class="gantt-unscheduled">${unscheduled} job${unscheduled===1?'':'s'} not shown — no tasks scheduled yet.</div>` : ''}
+      </div>`;
+    }
+
+    function renderJobsList(state){
+      const jobs = state.jobs.slice().sort((a,b)=>(a.order??999)-(b.order??999));
+      const cards = jobs.map(j=>{
+        const s = j.cachedSummary || {};
+        return `<div class="jobcard card" data-action="open-job" data-id="${j.id}">
+          <div class="top">
+            <div><div class="jobcode">${escapeHtml(j.code||'—')}</div><div class="jobdesc">${escapeHtml(j.description||'')}</div>${j.clientName?`<div class="jobclient">${escapeHtml(j.clientName)}</div>`:''}</div>
+            <span class="pill ${statusPillClass(j.status)}">${escapeHtml(j.status||'No status')}</span>
+          </div>
+          <div class="jobstats">
+            <div class="stat"><b class="mono">${j.startDate?fmtDate(j.startDate):'—'}</b><span>Start</span></div>
+            <div class="stat"><b class="mono">${s.totalWorkingDays!=null?fmtDays(s.totalWorkingDays):'—'}</b><span>Days</span></div>
+            <div class="stat"><b class="mono">${s.estimatedCompletionDate?fmtDate(s.estimatedCompletionDate):'—'}</b><span>Finish</span></div>
+            <div class="stat"><b class="mono">${s.criticalTaskCount!=null?s.criticalTaskCount:'—'}</b><span>Critical</span></div>
+            <div class="stat"><b class="mono">${s.bottleneckCount!=null?s.bottleneckCount:'—'}</b><span>Bottlenecks</span></div>
+          </div>
+        </div>`;
+      }).join('');
+      return `
+        <div class="pagehead">
+          <div><h1>Jobs</h1><p>Every renovation job, with a completion date calculated from real tasks — not typed in by hand.</p></div>
+          <button class="btn" data-action="new-job">+ New job</button>
+        </div>
+        ${renderPortfolioGantt(jobs)}
+        ${jobs.length ? `<div class="grid-jobs">${cards}</div>` : `<div class="card empty">No jobs yet. Add your first one.</div>`}
+        ${renderRisksBlock(state.risks, state.risksExpanded)}
+      `;
+    }
+
+    function renderNewJobForm(){
+      return `<div class="card" style="padding:18px;max-width:520px;margin-bottom:20px;">
+        <h2 style="margin-bottom:12px;">New job</h2>
+        <form data-form="new-job" style="display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);font-weight:600;">Unit / job code
+            <input name="code" required placeholder="e.g. 29A" style="padding:8px 10px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);font-weight:600;">Description
+            <input name="description" placeholder="e.g. Patio tiling, floors & paint" style="padding:8px 10px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);font-weight:600;">Client name
+            <input name="clientName" placeholder="e.g. Elsabe Schoeman" style="padding:8px 10px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);">
+          </label>
+          <div style="display:flex;gap:10px;">
+            <label style="flex:1;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);font-weight:600;">Quote number
+              <input name="quoteNumber" placeholder="e.g. QU00220" style="padding:8px 10px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);">
+            </label>
+            <label style="flex:1;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);font-weight:600;">Quote date
+              <input name="quoteDate" type="date" style="padding:8px 10px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);">
+            </label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);font-weight:600;">Start date
+            <input name="startDate" type="date" required value="${localISODate()}" style="padding:8px 10px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);">
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;"><input type="checkbox" name="isEstateJob" checked data-onchange="estate-toggle"> Estate job (noise rules — no weekend work, ever)</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;"><input type="checkbox" name="saturdayCatchUp"> Allow Saturday catch-up on this job</label>
+          <p style="font-size:11px;color:var(--ink-faint);margin:-4px 0 0;">Estate jobs can never work weekends — untick "Estate job" first if this is a non-estate client (e.g. a business premises like DRS) that needs the Saturday option.</p>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn" type="submit">Create job</button>
+            <button class="btn secondary" type="button" data-action="cancel-new-job">Cancel</button>
+          </div>
+        </form>
+      </div>`;
+    }
+
+    function timelineBars(job, tasks, schedule){
+      if (!tasks.length || schedule.error) return '';
+      const start = Math.min.apply(null, tasks.map(t=>schedule.perTask[t.id].RS));
+      const end = Math.max.apply(null, tasks.map(t=>schedule.perTask[t.id].RF));
+      const span = Math.max(0.01, end - start);
+      const rows = tasks.slice().sort((a,b)=>schedule.perTask[a.id].RS - schedule.perTask[b.id].RS).map(t=>{
+        const p = schedule.perTask[t.id];
+        const left = ((p.RS-start)/span*100).toFixed(1);
+        const width = Math.max(1.5, ((p.RF-p.RS)/span*100)).toFixed(1);
+        return `<div class="tl-row">
+          <div class="lbl" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>
+          <div class="tl-track"><div class="tl-bar ${p.isCritical?'critical':''}" style="left:${left}%;width:${width}%;" title="${fmtDate(p.calendarStart)} → ${fmtDate(p.calendarFinish)}"></div></div>
+        </div>`;
+      }).join('');
+      return `<div class="timeline"><h3 style="font-size:14px;margin-bottom:8px;">Timeline</h3>${rows}</div>`;
+    }
+
+    function taskRow(t, schedule, crewById){
+      const p = schedule.perTask ? schedule.perTask[t.id] : null;
+      const crewNames = (t.crewIds||[]).map(id=>crewById[id]?crewById[id].name:'?').join(', ') || '—';
+      const badges = [];
+      if (p){
+        if (p.isCritical) badges.push('<span class="badge crit">Critical</span>');
+        else if (p.isNearCritical) badges.push('<span class="badge near">Near-critical</span>');
+        if (p.isSubcontractor) badges.push('<span class="badge sub">Subcontractor</span>');
+        if (p.isSpecialistSingleOperator) badges.push('<span class="badge spec">Specialist</span>');
+        if (p.isGeneralistPenalized) badges.push('<span class="badge gen">Generalist</span>');
+      }
+      return `<tr class="${p&&p.isCritical?'critical':''}" data-task-id="${t.id}">
+        <td><div class="taskname">${escapeHtml(t.name)}</div><div class="tasknote">${escapeHtml(t.category)}${t.notes?' · '+escapeHtml(t.notes):''}</div><div class="badges">${badges.join('')}</div></td>
+        <td class="mono">${p?fmtDate(p.calendarStart):'—'}</td>
+        <td class="mono">${p?fmtDate(p.calendarFinish):'—'}</td>
+        <td class="mono">${p?fmtDays(p.durationDays):'—'}</td>
+        <td class="mono">${p?fmtDays(p.slack):'—'}</td>
+        <td>${escapeHtml(crewNames)}</td>
+        <td><button class="btn ghost small" data-action="delete-task" data-id="${t.id}">Remove</button></td>
+      </tr>`;
+    }
+
+    function taskForm(job, tasks, categories, crew){
+      const catOptions = CATEGORY_ORDER.map(k=>`<option value="${k}">${escapeHtml(categories[k].label)}</option>`).join('');
+      const depOptions = tasks.map(t=>`<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+      const crewChecks = crew.map(c=>`<label><input type="checkbox" name="crewIds" value="${c.id}"> ${escapeHtml(c.name)}${c.role==='subcontractor'?' (sub)':''}</label>`).join('');
+      return `<form class="taskform" data-form="new-task">
+        <label>Task name<input name="name" required placeholder="e.g. Patio floor tiling"></label>
+        <label>Category<select name="category" data-onchange="category-changed">${catOptions}</select></label>
+        <label>Calc type<select name="calcType">
+          <option value="area">Area (m²)</option><option value="unit">Unit (count)</option>
+          <option value="block">Block (size tier)</option><option value="fixed">Fixed (manual days)</option>
+        </select></label>
+        <label>Sub-type<select name="subType" data-role="subtype"><option value="standard">Standard</option></select></label>
+        <label>Quantity<input name="quantity" type="number" step="0.1" placeholder="m² or count"></label>
+        <label>Block size tier<select name="blockSizeTier"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label>
+        <label>Manual duration override (days)<input name="durationOverrideDays" type="number" step="0.1" placeholder="only if fixed / overriding"></label>
+        <label>Depends on (same job)<select name="dependsOn" multiple size="3">${depOptions}</select></label>
+        <label class="full">Crew assigned<div class="crewpick">${crewChecks}</div></label>
+        <label class="full">Notes<input name="notes" placeholder="optional — e.g. estimate, confirm real m²"></label>
+        <div class="actions">
+          <button class="btn" type="submit">Add task</button>
+        </div>
+      </form>`;
+    }
+
+    function fmtR(n){
+      if (n===null || n===undefined) return '';
+      return 'R' + n.toLocaleString('en-ZA', {minimumFractionDigits:2, maximumFractionDigits:2});
+    }
+
+    function timeTrackedCrew(crewList){
+      return crewList.filter(c=>c.logsTime && c.role!=='subcontractor').slice().sort((a,b)=>a.name.localeCompare(b.name));
+    }
+
+    function renderTimeOnSite(job, crewList){
+      const staff = timeTrackedCrew(crewList);
+      if (!staff.length) return '';
+      const crewById = {}; crewList.forEach(c=>crewById[c.id]=c);
+      const entries = (job.timeOnSite||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'') || (b.addedAt||'').localeCompare(a.addedAt||''));
+
+      const totals = {};
+      entries.forEach(e=>{ totals[e.crewId] = (totals[e.crewId]||0) + (Number(e.days)||0); });
+      const summary = staff.some(c=>totals[c.id]) ? `<div class="time-summary">${staff.filter(c=>totals[c.id]).map(c=>
+        `<div class="chip"><span>${escapeHtml(c.name)}</span><b>${fmtDays(totals[c.id])}</b></div>`).join('')}</div>` : '';
+
+      const pickRows = staff.map(c=>`<div class="timepick-row">
+          <label><input type="checkbox" name="crew" value="${c.id}" checked> ${escapeHtml(c.name)}</label>
+          <input type="number" name="days_${c.id}" step="0.5" min="0" value="1">
+        </div>`).join('');
+
+      const rows = entries.map(e=>`<tr>
+          <td class="timedate mono">${fmtDate(e.date)}</td>
+          <td>${escapeHtml(crewById[e.crewId]?crewById[e.crewId].name:'—')}</td>
+          <td class="num mono">${fmtDays(Number(e.days)||0)}</td>
+          <td><button class="btn ghost small" data-action="delete-timeonsite" data-id="${e.id}">Remove</button></td>
+        </tr>`).join('');
+      const list = entries.length ? `<table class="timelist">
+          <thead><tr><th>Date</th><th>Who</th><th class="num">Days</th><th></th></tr></thead>
+          <tbody>${rows}</tbody></table>` : `<div class="empty" style="padding:8px 2px;">No time logged yet.</div>`;
+
+      return `<div class="timebox card" style="padding:16px 18px;">
+        <h3>Time on site</h3>
+        ${summary}
+        <form class="timeform" data-form="new-timeonsite">
+          <div class="timeform-top">
+            <label>Date<input type="date" name="date" value="${localISODate()}"></label>
+          </div>
+          <div class="timepick">${pickRows}</div>
+          <button class="btn secondary" type="submit">+ Log</button>
+        </form>
+        ${list}
+      </div>`;
+    }
+
+    function renderActualSpend(job){
+      const entries = (job.actualSpend||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'') || (b.addedAt||'').localeCompare(a.addedAt||''));
+      const totalSpent = entries.reduce((sum,e)=>sum + (Number(e.amount)||0), 0);
+      const totalQuoted = (job.quoteLineItems||[]).reduce((sum,it)=>sum + (Number(it.total)||0), 0);
+
+      let budgetBar = '';
+      if (totalQuoted){
+        const remaining = totalQuoted - totalSpent;
+        const cls = remaining < 0 ? 'over' : 'under';
+        budgetBar = `<div class="spend-budgetbar">
+          <div class="cell"><span>Quoted</span><b>${fmtR(totalQuoted)}</b></div>
+          <div class="cell"><span>Spent so far</span><b>${fmtR(totalSpent)}</b></div>
+          <div class="cell ${cls}"><span>${remaining<0?'Over by':'Remaining'}</span><b>${fmtR(Math.abs(remaining))}</b></div>
+        </div>`;
+      } else if (entries.length){
+        budgetBar = `<div class="spend-budgetbar"><div class="cell"><span>Logged spend</span><b>${fmtR(totalSpent)}</b></div></div>`;
+      }
+
+      const rows = entries.map(e=>`<tr>
+          <td class="spenddate mono">${fmtDate(e.date)}</td>
+          <td>${escapeHtml(e.description)}</td>
+          <td class="num mono">${fmtR(Number(e.amount)||0)}</td>
+          <td><button class="btn ghost small" data-action="delete-spend" data-id="${e.id}">Remove</button></td>
+        </tr>`).join('');
+      const list = entries.length ? `<table class="spendlist">
+          <thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th><th></th></tr></thead>
+          <tbody>${rows}</tbody></table>` : `<div class="empty" style="padding:8px 2px;">No actual spend logged yet.</div>`;
+
+      return `<div class="spendbox card" style="padding:16px 18px;">
+        <h3>Actual spend</h3>
+        ${budgetBar}
+        <form class="spendform" data-form="new-spend">
+          <label>Description<input type="text" name="description" placeholder="e.g. Vinyl flooring glue, 20L" required></label>
+          <label>Amount (R)<input type="number" name="amount" step="0.01" min="0" required></label>
+          <label>Date<input type="date" name="date" value="${localISODate()}"></label>
+          <button class="btn secondary" type="submit">+ Log</button>
+        </form>
+        ${list}
+      </div>`;
+    }
+
+    function jobQuotes(job){
+      if (Array.isArray(job.quotes) && job.quotes.length) return job.quotes;
+      if (job.quoteNumber) return [{number: job.quoteNumber, date: job.quoteDate||null}];
+      return [];
+    }
+
+    function quoteLabel(q){
+      return q.number ? ('Quote '+q.number+(q.date?' ('+fmtDate(q.date)+')':'')) : '';
+    }
+
+    function renderQuoteLineItems(job){
+      const items = job.quoteLineItems;
+      if (!items || !items.length) return '';
+      const quotes = jobQuotes(job);
+      const multiQuote = quotes.length > 1;
+
+      function rowsFor(list){
+        let lastSection = null;
+        return list.map(it=>{
+          let sectionRow = '';
+          if (it.section && it.section !== lastSection){
+            sectionRow = `<tr class="sectionrow"><td colspan="4">${escapeHtml(it.section)}</td></tr>`;
+            lastSection = it.section;
+          }
+          const qty = (it.qty!==null && it.qty!==undefined) ? it.qty : '';
+          return `${sectionRow}<tr>
+            <td>${escapeHtml(it.description)}${it.note?`<div class="quotenote">${escapeHtml(it.note)}</div>`:''}</td>
+            <td class="num mono">${qty}</td>
+            <td class="num mono">${fmtR(it.unitPrice)}</td>
+            <td class="num mono">${fmtR(it.total)}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      let body;
+      if (multiQuote){
+        body = quotes.map(q=>{
+          const list = items.filter(it=>it.quoteNumber===q.number);
+          if (!list.length) return '';
+          const subtotal = list.reduce((sum,it)=>sum+(it.total||0),0);
+          return `<tr class="sectionrow" style="padding-top:18px;"><td colspan="4" style="color:var(--ink-dim);font-size:12px;">${escapeHtml(quoteLabel(q))}</td></tr>
+            ${rowsFor(list)}
+            <tr class="totalrow"><td colspan="2"></td><td class="num" style="font-weight:600;">Subtotal</td><td class="num">${fmtR(subtotal)}</td></tr>`;
+        }).join('');
+      } else {
+        body = rowsFor(items);
+      }
+      const total = items.reduce((sum,it)=>sum + (it.total||0), 0);
+      const meta = !multiQuote && quotes[0] ? quoteLabel(quotes[0]) : (multiQuote ? quotes.length+' quotes' : '');
+      return `<div class="quotebox card" style="padding:16px 18px;">
+        <h3>Quote line items ${meta?`<span class="quotemeta">${escapeHtml(meta)}</span>`:''}</h3>
+        <table class="quoteitems">
+          <thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Total</th></tr></thead>
+          <tbody>${body}<tr class="totalrow"><td colspan="2"></td><td class="num">Total</td><td class="num">${fmtR(total)}</td></tr></tbody>
+        </table>
+      </div>`;
+    }
+
+    function renderJobDetail(state){
+      const job = state.currentJob;
+      if (!job) return `<div class="empty">Job not found.</div>`;
+      const tasks = state.currentJobTasks;
+      const crewById = {}; state.crew.forEach(c=>crewById[c.id]=c);
+      const schedule = Scheduler.computeSchedule(tasks, crewById, state.settings, job.startDate, jobAllowsWeekendCatchUp(job));
+      const s = schedule.error ? null : schedule;
+
+      const summary = s ? `<div class="summarybar">
+        <div class="cell"><span>Working days</span><b class="mono">${fmtDays(s.projectFinishDays)}</b></div>
+        <div class="cell"><span>Est. completion</span><b class="mono">${fmtDate(s.completionDate)}</b></div>
+        <div class="cell"><span>Critical tasks</span><b class="mono">${s.criticalTaskIds.length}</b></div>
+        <div class="cell"><span>Bottlenecks</span><b class="mono">${s.bottleneckTaskIds.length}</b></div>
+      </div>` : `<div class="banner"><strong>Can't schedule:</strong> ${escapeHtml(schedule.message||'unknown error')}</div>`;
+
+      const rows = tasks.slice().sort((a,b)=>(a.order||0)-(b.order||0)).map(t=>taskRow(t, s||{perTask:{}}, crewById)).join('');
+      const table = tasks.length ? `<table class="tasks">
+        <thead><tr><th>Task</th><th>Start</th><th>Finish</th><th>Duration</th><th>Slack</th><th>Crew</th><th></th></tr></thead>
+        <tbody>${rows}</tbody></table>` : `<div class="empty">No tasks yet — add the first one below.</div>`;
+
+      const tl = s ? timelineBars(job, tasks, s) : '';
+      const isEstate = job.isEstateJob !== false;
+      const jobSettingsBar = `<div class="card" style="padding:9px 14px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;"><input type="checkbox" data-jobfield="isEstateJob" ${isEstate?'checked':''}> Estate job (no weekend work, ever)</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;${isEstate?'opacity:.45;':''}" title="${isEstate?'Untick the estate flag first — estates never get weekend work.':''}"><input type="checkbox" data-jobfield="saturdayCatchUp" ${job.saturdayCatchUp?'checked':''} ${isEstate?'disabled':''}> Allow Saturday catch-up</label>
+      </div>`;
+
+      return `
+        <a class="backlink" href="#/jobs">← All jobs</a>
+        <div class="jobheader">
+          <div class="idbox"><span class="jobcode">${escapeHtml(job.code)}</span><span style="color:var(--ink-dim);">${escapeHtml(job.description||'')}</span></div>
+          <span class="pill ${statusPillClass(job.status)}">${escapeHtml(job.status||'No status')}</span>
+        </div>
+        ${(job.clientName||jobQuotes(job).length) ? `<div class="jobclientline">${job.clientName?escapeHtml(job.clientName):''}${job.clientName&&jobQuotes(job).length?' · ':''}${escapeHtml(jobQuotes(job).map(quoteLabel).join(' & '))}</div>` : ''}
+        ${jobSettingsBar}
+        ${summary}
+        ${taskForm(job, tasks, state.settings.rates.categories, state.crew)}
+        ${table}
+        ${tl}
+        ${renderTimeOnSite(job, state.crew)}
+        ${renderActualSpend(job)}
+        ${renderQuoteLineItems(job)}
+      `;
+    }
+
+    function renderSettings(state){
+      const cats = state.settings.rates.categories;
+      const rateRows = CATEGORY_ORDER.map(key=>{
+        const c = cats[key];
+        const rateLabel = c.defaultCalcType==='area' ? 'm²/day' : c.defaultCalcType==='unit' ? 'days/unit' : 'calc type: '+c.defaultCalcType;
+        const rateVal = c.defaultCalcType==='area' ? c.baseRatePerDay : c.defaultCalcType==='unit' ? c.timePerUnitDays : '';
+        const subRows = Object.keys(c.subTypes||{}).map(sk=>{
+          const st = c.subTypes[sk];
+          return `<tr><td style="padding-left:18px;color:var(--ink-dim);">${escapeHtml(st.label)}</td><td></td>
+            <td><input data-rate="multiplier" data-cat="${key}" data-sub="${sk}" type="number" step="0.01" value="${st.multiplier}"></td></tr>`;
+        }).join('');
+        return `<tr><td><strong>${escapeHtml(c.label)}</strong></td>
+          <td class="mono">${rateVal!==''?`<input data-rate="base" data-cat="${key}" data-calctype="${c.defaultCalcType}" type="number" step="0.1" value="${rateVal}"> ${rateLabel}`:rateLabel}</td>
+          <td></td></tr>${subRows}`;
+      }).join('');
+
+      const curveRows = Object.keys(state.settings.crewRules.efficiencyCurves).map(g=>{
+        const curve = state.settings.crewRules.efficiencyCurves[g];
+        return `<tr><td>${g}</td>
+          <td><input data-curve="${g}" data-n="1" type="number" step="0.01" value="${curve[1]}"></td>
+          <td><input data-curve="${g}" data-n="2" type="number" step="0.01" value="${curve[2]}"></td>
+          <td><input data-curve="${g}" data-n="3" type="number" step="0.01" value="${curve[3]}"></td></tr>`;
+      }).join('');
+
+      const crewRows = state.crew.map(c=>{
+        const tags = CATEGORY_ORDER.concat(['general']).map(tag=>{
+          const on = (c.tradeTags||[]).includes(tag);
+          return `<span class="tagchip ${on?'on':''}" data-action="toggle-tag" data-crew="${c.id}" data-tag="${tag}">${tag}</span>`;
+        }).join('');
+        const notes = (c.attendanceNotes||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(n=>
+          `<span class="crewnote-chip">${fmtDate(n.date)} — ${escapeHtml(n.note)}<span class="x" data-action="delete-crewnote" data-crew="${c.id}" data-id="${n.id}" title="Remove">×</span></span>`
+        ).join('');
+        return `<div class="crewblock">
+          <div class="crewrow">
+            <input type="text" value="${escapeHtml(c.name)}" data-action="rename-crew" data-crew="${c.id}">
+            <select data-action="role-crew" data-crew="${c.id}">
+              <option value="foreman" ${c.role==='foreman'?'selected':''}>Foreman</option>
+              <option value="labourer" ${c.role==='labourer'?'selected':''}>Labourer</option>
+              <option value="subcontractor" ${c.role==='subcontractor'?'selected':''}>Subcontractor</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink-dim);white-space:nowrap;" title="Show this person in each job's 'Time on site' log">
+              <input type="checkbox" data-action="toggle-logstime" data-crew="${c.id}" ${c.logsTime?'checked':''}> Logs time
+            </label>
+            <div class="tagcloud">${tags}</div>
+            <button class="btn ghost small" data-action="remove-crew" data-crew="${c.id}">Remove</button>
+          </div>
+          <div class="crewnotes">
+            ${notes || `<span class="crewnote-chip" style="background:transparent;padding:0;color:var(--ink-faint);">No absence/schedule notes</span>`}
+            <form class="crewnoteform" data-form="new-crewnote" data-crew="${c.id}">
+              <input type="date" name="date" value="${localISODate()}">
+              <input type="text" name="note" placeholder="e.g. Absent, half day, off Sat" required>
+              <button class="btn ghost small" type="submit">+ Note</button>
+            </form>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `
+        <div class="pagehead"><div><h1>Settings</h1><p>Every rate, curve and buffer the calculator uses — nothing here is fixed in code.</p></div></div>
+
+        <div class="settings-section card" style="padding:16px 18px;">
+          <h2>Working hours & calendar</h2>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;">
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);">Day start
+              <input data-cal="dayStart" value="${state.settings.calendar.dayStart}" style="padding:6px 8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);width:100px;"></label>
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);">Day end
+              <input data-cal="dayEnd" value="${state.settings.calendar.dayEnd}" style="padding:6px 8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);width:100px;"></label>
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);">Lunch (min)
+              <input data-cal="lunchMinutes" type="number" value="${state.settings.calendar.lunchMinutes}" style="padding:6px 8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);width:80px;"></label>
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-dim);">Productive hrs/day
+              <input data-cal="productiveHoursPerDay" type="number" step="0.1" value="${state.settings.calendar.productiveHoursPerDay}" style="padding:6px 8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface-2);width:80px;"></label>
+          </div>
+          <p style="font-size:11.5px;color:var(--ink-faint);margin-top:8px;">Working days: Mon–Fri by default — Sunday is never worked. Saturday is a per-job "catch-up" toggle, and each job also carries an "Estate job" flag (edit both from the job's page) — when a job is flagged as an estate job, Saturday catch-up is locked off automatically, since estate noise rules ban weekend work outright. Only a confirmed non-estate client (e.g. DRS) should have the estate flag unticked.</p>
+        </div>
+
+        <div class="settings-section card" style="padding:16px 18px;">
+          <h2>Crew roster</h2>
+          <div class="crewlist">${crewRows}</div>
+          <button class="btn secondary small" style="margin-top:10px;" data-action="add-crew">+ Add crew member</button>
+        </div>
+
+        <div class="settings-section card" style="padding:16px 18px;">
+          <h2>Crew efficiency curves</h2>
+          <table class="rate-table"><thead><tr><th>Group</th><th>1 worker</th><th>2 workers</th><th>3 workers</th></tr></thead>
+          <tbody>${curveRows}</tbody></table>
+          <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin-top:8px;">Generalist penalty (speed factor)
+            <input data-curve="generalistPenalty" type="number" step="0.05" value="${state.settings.crewRules.generalistPenalty}" style="width:70px;padding:5px 7px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface-2);"></label>
+        </div>
+
+        <div class="settings-section card" style="padding:16px 18px;">
+          <h2>Categories &amp; rates</h2>
+          <table class="rate-table"><thead><tr><th>Category</th><th>Base rate</th><th>Complexity multiplier</th></tr></thead>
+          <tbody>${rateRows}</tbody></table>
+        </div>
+      `;
+    }
+
+    function renderShell(state){
+      let body;
+      if (state.route.name==='jobs') body = (state.showNewJobForm?renderNewJobForm():'') + renderJobsList(state);
+      else if (state.route.name==='job') body = renderJobDetail(state);
+      else if (state.route.name==='settings') body = renderSettings(state);
+      else body = renderJobsList(state);
+
+      const demoBanner = state.dbUnavailable ? `<div class="demo-banner"><strong>Example data</strong> — storage isn't connected in this preview, so nothing you change here is saved.</div>` : '';
+      document.getElementById('main').innerHTML = demoBanner + body;
+      document.querySelectorAll('#rail nav a').forEach(a=>{
+        a.classList.toggle('active', a.dataset.route === (state.route.name==='job'?'jobs':state.route.name));
+      });
+    }
+
+    return { renderShell };
+  })();
+
+  /* =========================================================
+     SECTION: Router
+     ========================================================= */
+  const Router = (function(){
+    function parse(){
+      const hash = window.location.hash.replace(/^#\/?/, '');
+      const parts = hash.split('/').filter(Boolean);
+      if (parts[0] === 'jobs' && parts[1]) return { name:'job', id:parts[1] };
+      if (parts[0] === 'settings') return { name:'settings' };
+      return { name:'jobs' };
+    }
+    function onChange(cb){ window.addEventListener('hashchange', ()=>cb(parse())); }
+    return { parse, onChange };
+  })();
+
+  /* =========================================================
+     SECTION: App — wiring
+     ========================================================= */
+  const App = (function(){
+    const state = {
+      route: Router.parse(),
+      jobs: [], crew: [], settings: { calendar: DEFAULT_CALENDAR, rates: DEFAULT_RATES, crewRules: DEFAULT_CREW_RULES },
+      currentJob: null, currentJobTasks: [], risks: [],
+      showNewJobForm: false, dbUnavailable: false, risksExpanded: false,
+    };
+    let unsubTasks = null;
+    let db = null;
+
+    function render(){ UI.renderShell(state); }
+
+    function loadForRoute(){
+      if (unsubTasks){ unsubTasks(); unsubTasks = null; }
+      if (state.route.name === 'job'){
+        state.currentJob = state.jobs.find(j=>j.id===state.route.id) || null;
+        if (db){
+          unsubTasks = DataAccess.watchTasks(state.route.id, tasks=>{
+            state.currentJobTasks = tasks;
+            maybeWriteBackSummary();
+            render();
+          });
+        } else {
+          state.currentJobTasks = state.route.id === 'sample-job-1' ? SAMPLE_TASKS : [];
+          render();
+        }
+      } else {
+        render();
+        if (state.route.name === 'jobs') refreshRisks();
+      }
+    }
+
+    async function refreshRisks(){
+      const crewById = {}; state.crew.forEach(c=>crewById[c.id]=c);
+      if (!db){
+        const tasksByJob = { 'sample-job-1': SAMPLE_TASKS };
+        state.risks = computeRisksList(state.jobs, tasksByJob, crewById, state.settings);
+        render();
+        return;
+      }
+      const jobIds = state.jobs.map(j=>j.id);
+      if (!jobIds.length){ state.risks = []; render(); return; }
+      const tasksByJob = await DataAccess.getAllTasksOnce(jobIds);
+      if (state.route.name !== 'jobs') return; // user navigated away while fetching
+      state.risks = computeRisksList(state.jobs, tasksByJob, crewById, state.settings);
+      render();
+    }
+
+    function maybeWriteBackSummary(){
+      if (!db || !state.currentJob || !state.currentJobTasks.length) return;
+      const crewById = {}; state.crew.forEach(c=>crewById[c.id]=c);
+      const sched = Scheduler.computeSchedule(state.currentJobTasks, crewById, state.settings, state.currentJob.startDate, jobAllowsWeekendCatchUp(state.currentJob));
+      if (sched.error) return;
+      const newSummary = {
+        totalWorkingDays: Math.round(sched.projectFinishDays*10)/10,
+        estimatedCompletionDate: sched.completionDate,
+        criticalTaskCount: sched.criticalTaskIds.length,
+        bottleneckCount: sched.bottleneckTaskIds.length,
+        computedAt: new Date().toISOString(),
+      };
+      const cur = state.currentJob.cachedSummary || {};
+      const changed = cur.totalWorkingDays !== newSummary.totalWorkingDays || cur.estimatedCompletionDate !== newSummary.estimatedCompletionDate
+        || cur.criticalTaskCount !== newSummary.criticalTaskCount || cur.bottleneckCount !== newSummary.bottleneckCount;
+      if (changed) DataAccess.saveJob(state.currentJob.id, { cachedSummary: newSummary });
+    }
+
+    function bindEvents(){
+      window.addEventListener('hashchange', ()=>{ state.route = Router.parse(); state.showNewJobForm=false; loadForRoute(); });
+
+      document.getElementById('main').addEventListener('click', (e)=>{
+        const el = e.target.closest('[data-action]');
+        if (!el) return;
+        const action = el.dataset.action;
+        if (action === 'open-job'){ window.location.hash = '#/jobs/'+el.dataset.id; }
+        else if (action === 'new-job'){ state.showNewJobForm = true; render(); }
+        else if (action === 'cancel-new-job'){ state.showNewJobForm = false; render(); }
+        else if (action === 'toggle-risks'){ state.risksExpanded = !state.risksExpanded; render(); }
+        else if (action === 'delete-task'){
+          if (state.currentJob) DataAccess.deleteTask(state.currentJob.id, el.dataset.id);
+        }
+        else if (action === 'add-crew'){
+          DataAccess.addCrewMember({ name:'New crew member', role:'labourer', tradeTags:['general'] });
+        }
+        else if (action === 'remove-crew'){ DataAccess.removeCrewMember(el.dataset.crew); }
+        else if (action === 'delete-crewnote'){
+          const c = state.crew.find(x=>x.id===el.dataset.crew); if(!c) return;
+          const remaining = (c.attendanceNotes||[]).filter(n=>n.id!==el.dataset.id);
+          DataAccess.saveCrewMember(c.id, { attendanceNotes: remaining });
+        }
+        else if (action === 'delete-spend'){
+          if (!state.currentJob) return;
+          const remaining = (state.currentJob.actualSpend||[]).filter(e=>e.id!==el.dataset.id);
+          DataAccess.saveJob(state.currentJob.id, { actualSpend: remaining });
+        }
+        else if (action === 'delete-timeonsite'){
+          if (!state.currentJob) return;
+          const remaining = (state.currentJob.timeOnSite||[]).filter(e=>e.id!==el.dataset.id);
+          DataAccess.saveJob(state.currentJob.id, { timeOnSite: remaining });
+        }
+        else if (action === 'toggle-tag'){
+          const c = state.crew.find(x=>x.id===el.dataset.crew); if(!c) return;
+          const tags = new Set(c.tradeTags||[]);
+          if (tags.has(el.dataset.tag)) tags.delete(el.dataset.tag); else tags.add(el.dataset.tag);
+          DataAccess.saveCrewMember(c.id, { tradeTags:[...tags] });
+        }
+      });
+
+      document.getElementById('main').addEventListener('change', (e)=>{
+        const el = e.target;
+        if (el.dataset.action === 'rename-crew'){ DataAccess.saveCrewMember(el.dataset.crew, { name: el.value }); }
+        else if (el.dataset.action === 'role-crew'){ DataAccess.saveCrewMember(el.dataset.crew, { role: el.value }); }
+        else if (el.dataset.action === 'toggle-logstime'){ DataAccess.saveCrewMember(el.dataset.crew, { logsTime: el.checked }); }
+        else if (el.dataset.cal){
+          const key = el.dataset.cal;
+          const val = (key==='lunchMinutes') ? parseInt(el.value,10) : (key==='productiveHoursPerDay') ? parseFloat(el.value) : el.value;
+          DataAccess.saveSettingsDoc('calendar', { [key]: val });
+        }
+        else if (el.dataset.rate === 'base'){
+          const cat = el.dataset.cat, calctype = el.dataset.calctype, val = parseFloat(el.value);
+          const rates = JSON.parse(JSON.stringify(state.settings.rates));
+          if (calctype==='area') rates.categories[cat].baseRatePerDay = val;
+          else if (calctype==='unit') rates.categories[cat].timePerUnitDays = val;
+          DataAccess.saveSettingsDoc('rates', { categories: rates.categories });
+        }
+        else if (el.dataset.rate === 'multiplier'){
+          const cat = el.dataset.cat, sub = el.dataset.sub, val = parseFloat(el.value);
+          const rates = JSON.parse(JSON.stringify(state.settings.rates));
+          rates.categories[cat].subTypes[sub].multiplier = val;
+          DataAccess.saveSettingsDoc('rates', { categories: rates.categories });
+        }
+        else if (el.dataset.curve && el.dataset.n){
+          const g = el.dataset.curve, n = el.dataset.n, val = parseFloat(el.value);
+          const cr = JSON.parse(JSON.stringify(state.settings.crewRules));
+          cr.efficiencyCurves[g][n] = val;
+          DataAccess.saveSettingsDoc('crewRules', { efficiencyCurves: cr.efficiencyCurves });
+        }
+        else if (el.dataset.curve === 'generalistPenalty'){
+          DataAccess.saveSettingsDoc('crewRules', { generalistPenalty: parseFloat(el.value) });
+        }
+        else if (el.dataset.onchange === 'estate-toggle'){
+          // New-job form only: estate jobs can't take Saturday work, so lock that
+          // checkbox off the moment "Estate job" is ticked.
+          const form = el.closest('form');
+          const satEl = form && form.querySelector('[name=saturdayCatchUp]');
+          if (satEl){ satEl.disabled = el.checked; if (el.checked) satEl.checked = false; }
+        }
+        else if (el.dataset.jobfield){
+          if (!state.currentJob) return;
+          const field = el.dataset.jobfield;
+          const patch = { [field]: el.checked };
+          if (field === 'isEstateJob' && el.checked) patch.saturdayCatchUp = false; // estate jobs never get weekend work
+          DataAccess.saveJob(state.currentJob.id, patch);
+        }
+      });
+
+      document.getElementById('main').addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const form = e.target;
+        if (form.dataset.form === 'new-job'){
+          const fd = new FormData(form);
+          const isEstateJob = !!fd.get('isEstateJob');
+          const qNum = fd.get('quoteNumber')||'';
+          const data = { code: fd.get('code'), description: fd.get('description')||'', status:'🟢 On track',
+            clientName: fd.get('clientName')||'', quotes: qNum ? [{number:qNum, date: fd.get('quoteDate')||null}] : [],
+            startDate: fd.get('startDate'), isEstateJob, saturdayCatchUp: isEstateJob ? false : !!fd.get('saturdayCatchUp'),
+            order: state.jobs.length+1, cachedSummary: {} };
+          DataAccess.createJob(data).then(ref=>{ state.showNewJobForm=false; if(ref) window.location.hash = '#/jobs/'+ref.id; else render(); });
+        } else if (form.dataset.form === 'new-task'){
+          if (!state.currentJob) return;
+          const fd = new FormData(form);
+          const crewIds = fd.getAll('crewIds');
+          const dependsOn = Array.from(form.querySelector('[name=dependsOn]').selectedOptions).map(o=>o.value);
+          const data = {
+            name: fd.get('name'), category: fd.get('category'), calcType: fd.get('calcType'),
+            quantity: fd.get('quantity') ? Number(fd.get('quantity')) : null,
+            subType: fd.get('subType') || 'standard',
+            blockSizeTier: fd.get('blockSizeTier') || 'small',
+            durationOverrideDays: fd.get('durationOverrideDays') ? Number(fd.get('durationOverrideDays')) : null,
+            crewIds, dependsOn, notes: fd.get('notes')||'', order: state.currentJobTasks.length+1,
+          };
+          DataAccess.createTask(state.currentJob.id, data).then(()=>form.reset());
+        } else if (form.dataset.form === 'new-spend'){
+          if (!state.currentJob) return;
+          const fd = new FormData(form);
+          const entry = {
+            id: 'sp_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+            description: fd.get('description'), amount: Number(fd.get('amount'))||0,
+            date: fd.get('date') || localISODate(), addedAt: new Date().toISOString(),
+          };
+          const updated = (state.currentJob.actualSpend||[]).concat([entry]);
+          DataAccess.saveJob(state.currentJob.id, { actualSpend: updated }).then(()=>form.reset());
+        } else if (form.dataset.form === 'new-timeonsite'){
+          if (!state.currentJob) return;
+          const fd = new FormData(form);
+          const date = fd.get('date') || localISODate();
+          const checkedIds = fd.getAll('crew');
+          const newEntries = checkedIds.map(crewId=>({
+            id: 'to_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)+'_'+crewId,
+            crewId, date, days: Number(fd.get('days_'+crewId))||0,
+            addedAt: new Date().toISOString(),
+          })).filter(e=>e.days>0);
+          if (!newEntries.length) return;
+          const updated = (state.currentJob.timeOnSite||[]).concat(newEntries);
+          DataAccess.saveJob(state.currentJob.id, { timeOnSite: updated }).then(()=>form.reset());
+        } else if (form.dataset.form === 'new-crewnote'){
+          const c = state.crew.find(x=>x.id===form.dataset.crew); if(!c) return;
+          const fd = new FormData(form);
+          const entry = {
+            id: 'cn_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+            date: fd.get('date') || localISODate(), note: fd.get('note'), addedAt: new Date().toISOString(),
+          };
+          const updated = (c.attendanceNotes||[]).concat([entry]);
+          DataAccess.saveCrewMember(c.id, { attendanceNotes: updated }).then(()=>form.reset());
+        }
+      });
+    }
+
+    async function init(){
+      bindEvents();
+      db = await DataAccess.getDb();
+      if (!db){
+        state.dbUnavailable = true;
+        state.jobs = SAMPLE_JOBS; state.crew = SAMPLE_CREW;
+        loadForRoute();
+        return;
+      }
+      await DataAccess.maybeImportSeedData();
+      await DataAccess.ensureSeeded();
+      DataAccess.watchSettings(settings=>{ state.settings = settings; render(); if(state.route.name==='job') maybeWriteBackSummary(); });
+      DataAccess.watchCrew(crew=>{ state.crew = crew; render(); });
+      DataAccess.watchJobs(jobs=>{ state.jobs = jobs; if(state.route.name==='job'){ state.currentJob = jobs.find(j=>j.id===state.route.id)||state.currentJob; } render(); if(state.route.name==='jobs') refreshRisks(); });
+      loadForRoute();
+    }
+
+    Router.onChange(r=>{ state.route=r; loadForRoute(); });
+    return { init };
+  })();
+
+  if (FIREBASE_CONFIGURED) App.init(); else renderSetupNotice();
+})();
+</script>
+</body></html>
