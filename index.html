@@ -819,6 +819,22 @@
       return 'neutral';
     }
 
+    // The typed status field (e.g. "🟢 On track") is set once when a job is created
+    // and often never revisited, so it can end up contradicting the job's actual
+    // list heading (e.g. still showing "On track" for a job that's sitting in
+    // "To be scheduled" or "On hold"). Trust listCategory for the coarse state and
+    // only keep the typed status where it adds real information beyond a bare
+    // "on track" (a specific blocked-on-what reason, a priority flag, etc).
+    function effectiveStatus(job){
+      const cat = job.listCategory || 'to_schedule';
+      const raw = (job.status || '').trim();
+      const strippedLower = raw.replace(/[^\w\s]/g, '').trim().toLowerCase();
+      const isGenericOnTrack = !raw || strippedLower === 'on track';
+      if (cat === 'on_hold') return isGenericOnTrack ? '⚪ On hold' : raw;
+      if (cat === 'to_schedule') return isGenericOnTrack ? '⏳ To be scheduled' : raw;
+      return raw || 'No status';
+    }
+
     function renderRiskLines(list){
       return list.map(r=>`<div class="riskrow">
           <span class="riskdot ${r.severity==='critical'?'dot-critical':'dot-warn'}"></span>
@@ -889,7 +905,7 @@
         return `<div class="gantt-row" data-action="open-job" data-id="${j.id}">
           <div class="lbl">${escapeHtml(j.code||'—')}<small>${escapeHtml(j.clientName||j.description||'')}</small></div>
           <div class="gantt-track" title="${fmtDate(j.startDate)} → ${fmtDate(j.cachedSummary.estimatedCompletionDate)}">
-            <div class="gantt-bar ${jobBarClass(j.status)}" style="left:${left}%;width:${width}%;">${fitsInside ? labelHtml : ''}</div>
+            <div class="gantt-bar ${jobBarClass(effectiveStatus(j))}" style="left:${left}%;width:${width}%;">${fitsInside ? labelHtml : ''}</div>
             ${fitsInside ? '' : labelHtml}
             <div class="gantt-today" style="left:${todayPct}%;"></div>
           </div>
@@ -921,7 +937,7 @@
         return `<div class="jobcard card" data-action="open-job" data-id="${j.id}">
           <div class="top">
             <div><div class="jobcode">${escapeHtml(j.code||'—')}</div><div class="jobdesc">${escapeHtml(j.description||'')}</div>${j.clientName?`<div class="jobclient">${escapeHtml(j.clientName)}</div>`:''}</div>
-            <span class="pill ${statusPillClass(j.status)}">${escapeHtml(j.status||'No status')}</span>
+            <span class="pill ${statusPillClass(effectiveStatus(j))}">${escapeHtml(effectiveStatus(j))}</span>
           </div>
           <div class="jobstats">
             <div class="stat"><b class="mono">${j.startDate?fmtDate(j.startDate):'—'}</b><span>Start</span></div>
@@ -1234,7 +1250,7 @@
         <a class="backlink" href="#/jobs">← All jobs</a>
         <div class="jobheader">
           <div class="idbox"><span class="jobcode">${escapeHtml(job.code)}</span><span style="color:var(--ink-dim);">${escapeHtml(job.description||'')}</span></div>
-          <span class="pill ${statusPillClass(job.status)}">${escapeHtml(job.status||'No status')}</span>
+          <span class="pill ${statusPillClass(effectiveStatus(job))}">${escapeHtml(effectiveStatus(job))}</span>
         </div>
         ${(job.clientName||jobQuotes(job).length) ? `<div class="jobclientline">${job.clientName?escapeHtml(job.clientName):''}${job.clientName&&jobQuotes(job).length?' · ':''}${escapeHtml(jobQuotes(job).map(quoteLabel).join(' & '))}</div>` : ''}
         ${jobSettingsBar}
