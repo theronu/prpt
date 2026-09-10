@@ -229,7 +229,9 @@
   .ganttcard{margin-bottom:20px;padding:16px 18px;}
   .ganttcard h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:2px;}
   .gantt-scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-faint);margin:2px 0 8px 130px;}
-  .gantt-rows{display:flex;flex-direction:column;gap:5px;}
+  .gantt-rows{display:flex;flex-direction:column;gap:14px;}
+  .gantt-group{display:flex;flex-direction:column;gap:5px;}
+  .gantt-group-heading{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);display:flex;align-items:center;gap:6px;}
   .gantt-row{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;cursor:pointer;}
   .gantt-row .lbl{font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .gantt-row .lbl small{display:block;font-weight:500;color:var(--ink-faint);font-size:10.5px;}
@@ -902,38 +904,40 @@
       const span = Math.max(1, maxFinish - minStart);
       const todayPct = ((todayMs - minStart) / span * 100).toFixed(2);
 
-      const PINNED_LAST = ['santini','70a','95a'];
-      const isPinnedLast = j => PINNED_LAST.includes(String(j.code||'').toLowerCase());
-      const rows = scheduled.slice()
-        .sort((a,b)=>{
-          const pa = isPinnedLast(a), pb = isPinnedLast(b);
-          if (pa !== pb) return pa ? 1 : -1;
-          return toTime(a.startDate) - toTime(b.startDate);
-        })
-        .map(j=>{
-          const start = toTime(j.startDate);
-          const finish = Math.max(start + 43200000, toTime(j.cachedSummary.estimatedCompletionDate));
-          const left = ((start - minStart) / span * 100).toFixed(2);
-          const width = Math.max(1.2, ((finish - start) / span * 100)).toFixed(2);
-          const daysLabel = fmtDays(j.cachedSummary.totalWorkingDays);
-          const fitsInside = parseFloat(width) >= 7;
-          const labelHtml = fitsInside
-            ? `<span class="gantt-bar-label in">${daysLabel}</span>`
-            : `<span class="gantt-bar-label out" style="left:${(parseFloat(left)+parseFloat(width)).toFixed(2)}%;">${daysLabel}</span>`;
-          return `<div class="gantt-row" data-action="open-job" data-id="${j.id}">
-            <div class="lbl">${escapeHtml(j.code||'—')}<small>${escapeHtml(j.clientName||j.description||'')}</small></div>
-            <div class="gantt-track" title="${fmtDate(j.startDate)} → ${fmtDate(j.cachedSummary.estimatedCompletionDate)}">
-              <div class="gantt-bar ${jobBarClass(j.status)}" style="left:${left}%;width:${width}%;">${fitsInside ? labelHtml : ''}</div>
-              ${fitsInside ? '' : labelHtml}
-              <div class="gantt-today" style="left:${todayPct}%;"></div>
-            </div>
-          </div>`;
-        }).join('');
+      const ganttRow = (j) => {
+        const start = toTime(j.startDate);
+        const finish = Math.max(start + 43200000, toTime(j.cachedSummary.estimatedCompletionDate));
+        const left = ((start - minStart) / span * 100).toFixed(2);
+        const width = Math.max(1.2, ((finish - start) / span * 100)).toFixed(2);
+        const daysLabel = fmtDays(j.cachedSummary.totalWorkingDays);
+        const fitsInside = parseFloat(width) >= 7;
+        const labelHtml = fitsInside
+          ? `<span class="gantt-bar-label in">${daysLabel}</span>`
+          : `<span class="gantt-bar-label out" style="left:${(parseFloat(left)+parseFloat(width)).toFixed(2)}%;">${daysLabel}</span>`;
+        return `<div class="gantt-row" data-action="open-job" data-id="${j.id}">
+          <div class="lbl">${escapeHtml(j.code||'—')}<small>${escapeHtml(j.clientName||j.description||'')}</small></div>
+          <div class="gantt-track" title="${fmtDate(j.startDate)} → ${fmtDate(j.cachedSummary.estimatedCompletionDate)}">
+            <div class="gantt-bar ${jobBarClass(j.status)}" style="left:${left}%;width:${width}%;">${fitsInside ? labelHtml : ''}</div>
+            ${fitsInside ? '' : labelHtml}
+            <div class="gantt-today" style="left:${todayPct}%;"></div>
+          </div>
+        </div>`;
+      };
+
+      const groups = JOB_LIST_CATEGORIES.map(({key,label})=>{
+        const groupJobs = scheduled.filter(j => (j.listCategory||'to_schedule') === key)
+          .slice().sort((a,b)=>toTime(a.startDate)-toTime(b.startDate));
+        if (!groupJobs.length) return '';
+        return `<div class="gantt-group">
+          <div class="gantt-group-heading">${label} <span class="joblist-count">${groupJobs.length}</span></div>
+          ${groupJobs.map(ganttRow).join('')}
+        </div>`;
+      }).join('');
 
       return `<div class="card ganttcard">
         <h2>Portfolio timeline</h2>
         <div class="gantt-scale"><span>${fmtDate(localISODate(new Date(minStart)))}</span><span>${fmtDate(localISODate(new Date(maxFinish)))}</span></div>
-        <div class="gantt-rows">${rows}</div>
+        <div class="gantt-rows">${groups}</div>
         ${unscheduled ? `<div class="gantt-unscheduled">${unscheduled} job${unscheduled===1?'':'s'} not shown — no tasks scheduled yet.</div>` : ''}
       </div>`;
     }
