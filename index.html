@@ -1223,6 +1223,7 @@
       const tl = s ? timelineBars(job, tasks, s) : '';
       const isEstate = job.isEstateJob !== false;
       const jobSettingsBar = `<div class="card" style="padding:9px 14px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+                <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;">Start date <input type="date" data-jobfield="startDate" value="${job.startDate||''}" style="font-size:11px;padding:3px 6px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface-2);"></label>
         <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;"><input type="checkbox" data-jobfield="isEstateJob" ${isEstate?'checked':''}> Estate job (no weekend work, ever)</label>
         <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;${isEstate?'opacity:.45;':''}" title="${isEstate?'Untick the estate flag first — estates never get weekend work.':''}"><input type="checkbox" data-jobfield="saturdayCatchUp" ${job.saturdayCatchUp?'checked':''} ${isEstate?'disabled':''}> Allow Saturday catch-up</label>
       </div>`;
@@ -1526,6 +1527,23 @@
         else if (el.dataset.jobfield){
           if (!state.currentJob) return;
           const field = el.dataset.jobfield;
+                    if (field === 'startDate'){
+                      if (!el.value) return; // ignore a cleared date field
+                      const patch = { startDate: el.value };
+                      const crewById = {}; state.crew.forEach(c=>crewById[c.id]=c);
+                      const sched = Scheduler.computeSchedule(state.currentJobTasks, crewById, state.settings, el.value, jobAllowsWeekendCatchUp(state.currentJob));
+                      if (!sched.error){
+                        patch.cachedSummary = {
+                          totalWorkingDays: Math.round(sched.projectFinishDays*10)/10,
+                          estimatedCompletionDate: sched.completionDate,
+                          criticalTaskCount: sched.criticalTaskIds.length,
+                          bottleneckCount: sched.bottleneckTaskIds.length,
+                          computedAt: new Date().toISOString(),
+                        };
+                      }
+                      DataAccess.saveJob(state.currentJob.id, patch);
+                      return;
+                    }
           const patch = { [field]: el.checked };
           if (field === 'isEstateJob' && el.checked) patch.saturdayCatchUp = false; // estate jobs never get weekend work
           DataAccess.saveJob(state.currentJob.id, patch);
