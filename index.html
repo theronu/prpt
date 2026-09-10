@@ -1026,7 +1026,7 @@
         <td><div class="taskname">${escapeHtml(t.name)}</div><div class="tasknote">${escapeHtml(t.category)}${t.notes?' · '+escapeHtml(t.notes):''}</div><div class="badges">${badges.join('')}</div></td>
         <td class="mono">${p?fmtDate(p.calendarStart):'—'}</td>
         <td class="mono">${p?fmtDate(p.calendarFinish):'—'}</td>
-        <td class="mono">${p?fmtDays(p.durationDays):'—'}</td>
+        <td class="mono"><input type="number" step="0.1" min="0" data-action="edit-task-duration" data-task-id="${t.id}" value="${p?Math.round(p.durationDays*10)/10:''}" style="width:56px;font:inherit;padding:2px 4px;border-radius:4px;border:1px solid var(--border-strong);background:var(--surface-2);" title="${t.durationOverrideDays!=null&&t.durationOverrideDays!==''?'Manually set — clear the box to go back to auto-calculated':'Auto-calculated — type a number to override'}"> d</td>
         <td class="mono">${p?fmtDays(p.slack):'—'}</td>
         <td><div class="crewpick small">${crewOptions}</div></td>
         <td><button class="btn ghost small" data-action="delete-task" data-id="${t.id}">Remove</button></td>
@@ -1502,6 +1502,14 @@
           const ids = new Set(task.crewIds||[]);
           if (el.checked) ids.add(el.dataset.crewId); else ids.delete(el.dataset.crewId);
           DataAccess.saveTask(state.currentJob.id, task.id, { crewIds: [...ids] });
+        }
+        else if (el.dataset.action === 'edit-task-duration'){
+          if (!state.currentJob) return;
+          const task = state.currentJobTasks.find(x=>x.id===el.dataset.taskId);
+          if (!task) return;
+          const raw = el.value;
+          const override = raw === '' ? null : Number(raw);
+          DataAccess.saveTask(state.currentJob.id, task.id, { durationOverrideDays: override });
         }
         else if (el.dataset.cal){
           const key = el.dataset.cal;
