@@ -185,6 +185,10 @@
   .crewpick.small{gap:4px;}
   .crewpick.small label{padding:3px 7px;font-size:11px;}
 
+  .joblist-group{margin-bottom:22px;}
+  .joblist-heading{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .joblist-count{font-size:11px;background:var(--surface-2);border:1px solid var(--border-strong);border-radius:99px;padding:1px 8px;color:var(--ink-dim);font-weight:600;}
+
   .settings-section{margin-bottom:26px;}
   .settings-section h2{font-size:16px;margin-bottom:10px;}
   .rate-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:6px;}
@@ -375,6 +379,13 @@
 
   const CATEGORY_ORDER = ["demolition","building","plumbing","electrical","waterproofing","tiling","flooring",
     "painting","ceilings","carpentry","cabinetry","doors","windows","fixtures","cleaning","snagging"];
+
+  const JOB_LIST_CATEGORIES = [
+    { key: "snag", label: "Snag list" },
+    { key: "in_progress", label: "In progress" },
+    { key: "to_schedule", label: "To be scheduled" },
+    { key: "on_hold", label: "On hold" },
+  ];
 
   // Local-calendar-day formatter. Deliberately NOT toISOString().slice(0,10) — that
   // converts through UTC, and in a timezone ahead of UTC (e.g. Africa/Johannesburg,
@@ -929,7 +940,7 @@
 
     function renderJobsList(state){
       const jobs = state.jobs.slice().sort((a,b)=>(a.order??999)-(b.order??999));
-      const cards = jobs.map(j=>{
+      const jobCard = (j) => {
         const s = j.cachedSummary || {};
         return `<div class="jobcard card" data-action="open-job" data-id="${j.id}">
           <div class="top">
@@ -944,6 +955,14 @@
             <div class="stat"><b class="mono">${s.bottleneckCount!=null?s.bottleneckCount:'—'}</b><span>Bottlenecks</span></div>
           </div>
         </div>`;
+      };
+      const groups = JOB_LIST_CATEGORIES.map(({key,label})=>{
+        const groupJobs = jobs.filter(j => (j.listCategory||'to_schedule') === key);
+        if (!groupJobs.length) return '';
+        return `<div class="joblist-group">
+          <h2 class="joblist-heading">${label} <span class="joblist-count">${groupJobs.length}</span></h2>
+          <div class="grid-jobs">${groupJobs.map(jobCard).join('')}</div>
+        </div>`;
       }).join('');
       return `
         <div class="pagehead">
@@ -951,7 +970,7 @@
           <button class="btn" data-action="new-job">+ New job</button>
         </div>
         ${renderPortfolioGantt(jobs)}
-        ${jobs.length ? `<div class="grid-jobs">${cards}</div>` : `<div class="card empty">No jobs yet. Add your first one.</div>`}
+        ${jobs.length ? groups : `<div class="card empty">No jobs yet. Add your first one.</div>`}
         ${renderRisksBlock(state.risks, state.risksExpanded)}
       `;
     }
@@ -1227,8 +1246,10 @@
 
       const tl = s ? timelineBars(job, tasks, s) : '';
       const isEstate = job.isEstateJob !== false;
+      const jobListCategoryOptions = JOB_LIST_CATEGORIES.map(c=>`<option value="${c.key}" ${(job.listCategory||'to_schedule')===c.key?'selected':''}>${c.label}</option>`).join('');
       const jobSettingsBar = `<div class="card" style="padding:9px 14px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
                 <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;">Start date <input type="date" data-jobfield="startDate" value="${job.startDate||''}" style="font-size:11px;padding:3px 6px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface-2);"></label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;">List <select data-jobfield="listCategory" style="font-size:11px;padding:3px 6px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface-2);">${jobListCategoryOptions}</select></label>
         <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;"><input type="checkbox" data-jobfield="isEstateJob" ${isEstate?'checked':''}> Estate job (no weekend work, ever)</label>
         <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;${isEstate?'opacity:.45;':''}" title="${isEstate?'Untick the estate flag first — estates never get weekend work.':''}"><input type="checkbox" data-jobfield="saturdayCatchUp" ${job.saturdayCatchUp?'checked':''} ${isEstate?'disabled':''}> Allow Saturday catch-up</label>
       </div>`;
@@ -1563,6 +1584,10 @@
                         };
                       }
                       DataAccess.saveJob(state.currentJob.id, patch);
+                      return;
+                    }
+                    if (field === 'listCategory'){
+                      DataAccess.saveJob(state.currentJob.id, { listCategory: el.value });
                       return;
                     }
           const patch = { [field]: el.checked };
