@@ -784,34 +784,6 @@
       });
     });
 
-    const bookings = [];
-    Object.values(scheduleByJob).forEach(({job, tasks, sched})=>{
-      tasks.forEach(t=>{
-        const p = sched.perTask[t.id];
-        if (!p || !p.calendarStart || !p.calendarFinish) return;
-        (t.crewIds||[]).forEach(cid=>{
-          bookings.push({ crewId: cid, jobId: job.id, jobCode: job.code||'—', start: p.calendarStart, finish: p.calendarFinish });
-        });
-      });
-    });
-    const byCrew = {};
-    bookings.forEach(b=>{ (byCrew[b.crewId] = byCrew[b.crewId] || []).push(b); });
-    const seenPairs = new Set();
-    Object.entries(byCrew).forEach(([cid, list])=>{
-      for (let i=0;i<list.length;i++){
-        for (let j=i+1;j<list.length;j++){
-          const a=list[i], b=list[j];
-          if (a.jobId === b.jobId) continue;
-          if (!(a.start <= b.finish && b.start <= a.finish)) continue;
-          const pairKey = cid+'|'+[a.jobCode,b.jobCode].sort().join('/');
-          if (seenPairs.has(pairKey)) continue;
-          seenPairs.add(pairKey);
-          const name = (crewById[cid] && crewById[cid].name) || cid;
-          risks.push({ code: `${a.jobCode} / ${b.jobCode}`, group: 'Crew conflicts', text: `${name} double-booked — ${a.jobCode} & ${b.jobCode}`, severity:'critical' });
-        }
-      }
-    });
-
     risks.sort((a,b)=> (a.severity==='critical'?0:1) - (b.severity==='critical'?0:1));
     return risks;
   }
