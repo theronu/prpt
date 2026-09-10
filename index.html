@@ -832,6 +832,7 @@
       const isGenericOnTrack = !raw || strippedLower === 'on track';
       if (cat === 'on_hold') return isGenericOnTrack ? '⚪ On hold' : raw;
       if (cat === 'to_schedule') return isGenericOnTrack ? '⏳ To be scheduled' : raw;
+      if (cat === 'snag') return isGenericOnTrack ? '🔧 Snagging' : raw;
       return raw || 'No status';
     }
 
