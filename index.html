@@ -182,6 +182,8 @@
   form.taskform .actions{grid-column:1/-1;display:flex;gap:8px;margin-top:4px;}
   .crewpick{display:flex;flex-wrap:wrap;gap:6px;}
   .crewpick label{flex-direction:row;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border-strong);padding:5px 9px;border-radius:99px;font-weight:500;}
+  .crewpick.small{gap:4px;}
+  .crewpick.small label{padding:3px 7px;font-size:11px;}
 
   .settings-section{margin-bottom:26px;}
   .settings-section h2{font-size:16px;margin-bottom:10px;}
@@ -1006,9 +1008,12 @@
       return `<div class="timeline"><h3 style="font-size:14px;margin-bottom:8px;">Timeline</h3>${rows}</div>`;
     }
 
-    function taskRow(t, schedule, crewById){
+    function taskRow(t, schedule, crewById, crewList){
       const p = schedule.perTask ? schedule.perTask[t.id] : null;
-      const crewNames = (t.crewIds||[]).map(id=>crewById[id]?crewById[id].name:'?').join(', ') || '—';
+      const crewIds = t.crewIds||[];
+      const crewOptions = (crewList||Object.values(crewById)).slice().sort((a,b)=>a.name.localeCompare(b.name)).map(c=>
+        `<label><input type="checkbox" data-action="toggle-task-crew" data-task-id="${t.id}" data-crew-id="${c.id}" ${crewIds.includes(c.id)?'checked':''}> ${escapeHtml(c.name)}${c.role==='subcontractor'?' (sub)':''}</label>`
+      ).join('');
       const badges = [];
       if (p){
         if (p.isCritical) badges.push('<span class="badge crit">Critical</span>');
@@ -1023,7 +1028,7 @@
         <td class="mono">${p?fmtDate(p.calendarFinish):'—'}</td>
         <td class="mono">${p?fmtDays(p.durationDays):'—'}</td>
         <td class="mono">${p?fmtDays(p.slack):'—'}</td>
-        <td>${escapeHtml(crewNames)}</td>
+        <td><div class="crewpick small">${crewOptions}</div></td>
         <td><button class="btn ghost small" data-action="delete-task" data-id="${t.id}">Remove</button></td>
       </tr>`;
     }
@@ -1215,7 +1220,7 @@
         <div class="cell"><span>Bottlenecks</span><b class="mono">${s.bottleneckTaskIds.length}</b></div>
       </div>` : `<div class="banner"><strong>Can't schedule:</strong> ${escapeHtml(schedule.message||'unknown error')}</div>`;
 
-      const rows = tasks.slice().sort((a,b)=>(a.order||0)-(b.order||0)).map(t=>taskRow(t, s||{perTask:{}}, crewById)).join('');
+      const rows = tasks.slice().sort((a,b)=>(a.order||0)-(b.order||0)).map(t=>taskRow(t, s||{perTask:{}}, crewById, state.crew)).join('');
       const table = tasks.length ? `<table class="tasks">
         <thead><tr><th>Task</th><th>Start</th><th>Finish</th><th>Duration</th><th>Slack</th><th>Crew</th><th></th></tr></thead>
         <tbody>${rows}</tbody></table>` : `<div class="empty">No tasks yet — add the first one below.</div>`;
@@ -1490,6 +1495,14 @@
         if (el.dataset.action === 'rename-crew'){ DataAccess.saveCrewMember(el.dataset.crew, { name: el.value }); }
         else if (el.dataset.action === 'role-crew'){ DataAccess.saveCrewMember(el.dataset.crew, { role: el.value }); }
         else if (el.dataset.action === 'toggle-logstime'){ DataAccess.saveCrewMember(el.dataset.crew, { logsTime: el.checked }); }
+        else if (el.dataset.action === 'toggle-task-crew'){
+          if (!state.currentJob) return;
+          const task = state.currentJobTasks.find(x=>x.id===el.dataset.taskId);
+          if (!task) return;
+          const ids = new Set(task.crewIds||[]);
+          if (el.checked) ids.add(el.dataset.crewId); else ids.delete(el.dataset.crewId);
+          DataAccess.saveTask(state.currentJob.id, task.id, { crewIds: [...ids] });
+        }
         else if (el.dataset.cal){
           const key = el.dataset.cal;
           const val = (key==='lunchMinutes') ? parseInt(el.value,10) : (key==='productiveHoursPerDay') ? parseFloat(el.value) : el.value;
